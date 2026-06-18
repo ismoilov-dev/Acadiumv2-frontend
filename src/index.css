@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+/* Telegram Mini App Theme Adaptation */
+html.tg-app,
+html.tg-app body,
+html.tg-app #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: var(--tg-theme-bg-color, #0f172a);
+  color: var(--tg-theme-text-color, #f8fafc);
+}
+
+html.tg-app body {
+  background-color: var(--tg-theme-bg-color, #0f172a);
+}
+
+html.tg-app .bg-white {
+  background-color: var(--tg-theme-secondary-bg-color, #1e293b) !important;
+}
+
+html.tg-app .bg-gray-50 {
+  background-color: var(--tg-theme-bg-color, #0f172a) !important;
+}
+
+html.tg-app .bg-gray-100 {
+  background-color: var(--tg-theme-secondary-bg-color, #1e293b) !important;
+}
+
+html.tg-app .text-gray-900,
+html.tg-app .text-gray-800 {
+  color: var(--tg-theme-text-color, #f8fafc) !important;
+}
+
+html.tg-app .text-gray-700,
+html.tg-app .text-gray-600,
+html.tg-app .text-gray-500 {
+  color: var(--tg-theme-hint-color, #94a3b8) !important;
+}
+
+html.tg-app .border-gray-100,
+html.tg-app .border-gray-200,
+html.tg-app .border-gray-300 {
+  border-color: var(--tg-theme-secondary-bg-color, #334155) !important;
+}
+
+html.tg-app nav {
+  background-color: var(--tg-theme-secondary-bg-color, #1e293b) !important;
+  border-color: var(--tg-theme-secondary-bg-color, #334155) !important;
+}
+
+/* Specific buttons logic in Telegram app */
+html.tg-app button.bg-primary-600,
+html.tg-app button[type="submit"],
+html.tg-app a.bg-primary-600 {
+  background-color: var(--tg-theme-button-color, #3b82f6) !important;
+  color: var(--tg-theme-button-text-color, #ffffff) !important;
+}
+
+html.tg-app button.bg-gray-100,
+html.tg-app button.border-gray-300,
+html.tg-app a.bg-gray-100,
+html.tg-app a.border-gray-300 {
+  background-color: var(--tg-theme-secondary-bg-color, #1e293b) !important;
+  color: var(--tg-theme-text-color, #f8fafc) !important;
+  border-color: var(--tg-theme-secondary-bg-color, #334155) !important;
+}
+
+html.tg-app button.border-red-200,
+html.tg-app button.text-red-600 {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+}
+
+html.tg-app .text-primary-600,
+html.tg-app .text-primary-700 {
+  color: var(--tg-theme-link-color, #3b82f6) !important;
+}
+
+html.tg-app input, 
+html.tg-app select, 
+html.tg-app textarea {
+  background-color: var(--tg-theme-bg-color, #0f172a) !important;
+  color: var(--tg-theme-text-color, #f8fafc) !important;
+  border-color: var(--tg-theme-secondary-bg-color, #334155) !important;
+}
+
+/* Utility to ensure tap target size */
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
