@@ -121,13 +121,13 @@ export default function Navbar() {
                 </div>
               </div>
             )}
-            <button
+            {/* <button
               type="button"
               onClick={handleLogout}
               className="w-full rounded-lg bg-red-50 border border-red-100 py-3 text-center text-sm font-semibold text-red-600 transition-colors hover:bg-red-100 hover:text-red-700 tap-target flex items-center justify-center"
             >
               Chiqish
-            </button>
+            </button> */}
           </div>
         </div>
       )}
