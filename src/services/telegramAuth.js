@@ -21,17 +21,13 @@ export const telegramLogin = async () => {
     throw new Error('Telegram initData mavjud emas');
   }
 
-  const API_BASE =
-    import.meta.env.VITE_API_BASE_URL ||
-    'https://acadium.duckdns.org';
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  console.log('Telegram Auth URL:', `${API_BASE}/api/auth/telegram/`);
+  console.log('TELEGRAM API:', `${API_BASE}/api/auth/telegram/`);
 
   const response = await axios.post(
     `${API_BASE}/api/auth/telegram/`,
-    {
-      init_data,
-    },
+    { init_data },
     {
       headers: {
         'Content-Type': 'application/json',
