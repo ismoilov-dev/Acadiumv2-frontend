@@ -33,3 +33,4 @@ pnpm-debug.log*
 # Tizim fayllari (Operatsion tizim kesh fayllari)
 .DS_Store
 Thumbs.db
+node_modules/
