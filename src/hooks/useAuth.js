@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { storage } from '../utils/storage';
 import { authService } from '../services/authService';
 
@@ -7,26 +7,28 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
   const isAuthenticated = !!storage.getAccessToken();
 
-  const refreshUser = useCallback(async () => {
-    if (!storage.getAccessToken()) {
-      setUser(null);
-      setLoading(false);
-      return;
-    }
-    try {
-      const profile = await authService.getProfile();
-      setUser(profile);
-    } catch {
-      storage.clearAuth();
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   useEffect(() => {
-    refreshUser();
-  }, [refreshUser]);
+    const loadUser = async () => {
+      try {
+        if (!storage.getAccessToken()) {
+          setUser(null);
+          setLoading(false);
+          return;
+        }
+
+        const profile = await authService.getProfile();
+        setUser(profile);
+      } catch (err) {
+        console.error('Failed to load user profile:', err);
+        storage.clearAuth();
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   const login = async (email, password) => {
     const data = await authService.login(email, password);
@@ -39,5 +41,29 @@ export function useAuth() {
     setUser(null);
   };
 
-  return { user, loading, isAuthenticated, login, logout, refreshUser };
+  const refreshUser = async () => {
+    try {
+      if (!storage.getAccessToken()) {
+        setUser(null);
+        return;
+      }
+      const profile = await authService.getProfile();
+      setUser(profile);
+      return profile;
+    } catch (err) {
+      console.error('Failed to refresh user:', err);
+      storage.clearAuth();
+      setUser(null);
+      throw err;
+    }
+  };
+
+  return {
+    user,
+    loading,
+    isAuthenticated,
+    login,
+    logout,
+    refreshUser,
+  };
 }

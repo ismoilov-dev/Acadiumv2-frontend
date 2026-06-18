@@ -1,12 +1,10 @@
-import { useState } from 'react';
-import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import ErrorMessage from '../components/ErrorMessage';
 import { authService } from '../services/authService';
 import { formatError } from '../utils/formatError';
-import { storage } from '../utils/storage';
-
-import { isTelegram } from '../services/telegramAuth';
+import { useAuth } from '../hooks/useAuth';
 
 export default function Register() {
   const [form, setForm] = useState({
@@ -18,24 +16,23 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated, loading: authLoading } = useAuth();
 
-  const location = useLocation();
-  const tgError = new URLSearchParams(location.search).get('tg_error');
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
-  if (isTelegram()) {
-    if (storage.getAccessToken()) {
-      return <Navigate to="/" replace />;
-    }
-    if (!tgError) {
-      return (
-        <AuthLayout title="Acadium" subtitle="Telegram orqali avtomatik kirilmoqda...">
-          <div className="flex flex-col items-center justify-center py-8 space-y-4">
-            <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-sm text-gray-500 animate-pulse">Hisobga kirilmoqda...</p>
-          </div>
-        </AuthLayout>
-      );
-    }
+  if (authLoading) {
+    return (
+      <AuthLayout title="Acadium" subtitle="Loading...">
+        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-gray-500 animate-pulse">Loading authentication...</p>
+        </div>
+      </AuthLayout>
+    );
   }
 
   const handleChange = (e) => {
@@ -48,7 +45,7 @@ export default function Register() {
     setLoading(true);
     try {
       await authService.register(form);
-      navigate('/login');
+      navigate('/login', { replace: true });
     } catch (err) {
       setError(formatError(err));
     } finally {
@@ -78,7 +75,8 @@ export default function Register() {
               required
               value={form[name]}
               onChange={handleChange}
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+              disabled={loading}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
             />
           </div>
         ))}

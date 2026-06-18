@@ -2,43 +2,44 @@ import { BrowserRouter } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import AppRouter from './router';
 import { isTelegram, telegramLogin } from './services/telegramAuth';
+import { storage } from './utils/storage';
 
 export default function App() {
-  const [loading, setLoading] = useState(isTelegram());
+  const [ready, setReady] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const init = async () => {
-      if (!isTelegram()) {
-        setLoading(false);
-        return;
-      }
-
+    const initAuth = async () => {
       try {
-        document.documentElement.classList.add('tg-app');
+        const hasToken = !!storage.getAccessToken();
 
-        await telegramLogin();
+        if (isTelegram() && !hasToken) {
+          try {
+            await telegramLogin();
+          } catch (err) {
+            console.error('Telegram auth failed:', err);
+            setError('Telegram authentication failed');
+          }
+        }
 
-        window.location.replace('/');
-      } catch (error) {
-        console.error('Telegram login error:', error);
-
-        window.location.replace('/login?tg_error=1');
-      } finally {
-        setLoading(false);
+        setReady(true);
+      } catch (err) {
+        console.error('Auth init error:', err);
+        setReady(true);
       }
     };
 
-    init();
+    initAuth();
   }, []);
 
-  if (loading) {
+  if (!ready) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-gradient-to-tr from-slate-950 via-slate-900 to-indigo-950 text-white">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" />
           <h1 className="text-xl font-bold">Acadium AI</h1>
           <p className="mt-2 text-sm text-slate-400">
-            Telegram orqali avtomatik kirilmoqda...
+            {error ? 'Initializing...' : 'Initializing authentication...'}
           </p>
         </div>
       </div>

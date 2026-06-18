@@ -1,38 +1,33 @@
-import { useState } from 'react';
-import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../hooks/useAuth';
 import { formatError } from '../utils/formatError';
-import { storage } from '../utils/storage';
-
-import { isTelegram } from '../services/telegramAuth';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  const location = useLocation();
-  const tgError = new URLSearchParams(location.search).get('tg_error');
+  useEffect(() => {
+    if (isAuthenticated && !authLoading) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
-  if (isTelegram()) {
-    if (storage.getAccessToken()) {
-      return <Navigate to="/" replace />;
-    }
-    if (!tgError) {
-      return (
-        <AuthLayout title="Acadium" subtitle="Telegram orqali avtomatik kirilmoqda...">
-          <div className="flex flex-col items-center justify-center py-8 space-y-4">
-            <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-            <p className="text-sm text-gray-500 animate-pulse">Hisobga kirilmoqda...</p>
-          </div>
-        </AuthLayout>
-      );
-    }
+  if (authLoading) {
+    return (
+      <AuthLayout title="Acadium" subtitle="Loading...">
+        <div className="flex flex-col items-center justify-center py-8 space-y-4">
+          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm text-gray-500 animate-pulse">Loading authentication...</p>
+        </div>
+      </AuthLayout>
+    );
   }
 
   const handleSubmit = async (e) => {
@@ -41,7 +36,7 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/', { replace: true });
     } catch (err) {
       setError(formatError(err));
     } finally {
@@ -64,7 +59,8 @@ export default function Login() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            disabled={loading}
+            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
           />
         </div>
 
@@ -78,7 +74,8 @@ export default function Login() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+            disabled={loading}
+            className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:opacity-50"
           />
         </div>
 
