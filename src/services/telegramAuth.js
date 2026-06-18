@@ -11,7 +11,10 @@ export const telegramLogin = async () => {
   const init_data = tg.initData
   if (!init_data) throw new Error('Telegram initData mavjud emas')
 
-  const res = await fetch('/api/users/auth/telegram/', {
+  // Get API base URL from environment or construct it
+  const apiBase = import.meta.env.VITE_API_BASE_URL || `${window.location.origin}/api`;
+
+  const res = await fetch(`${apiBase}/auth/telegram/`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ init_data })

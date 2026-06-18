@@ -1,8 +1,16 @@
 import axios from 'axios';
 import { storage } from '../utils/storage';
 
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+  // For development: use current domain + /api
+  return `${window.location.origin}/api`;
+};
+
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: getBaseURL(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -55,7 +63,7 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await axios.post('/auth/token/refresh/', {
+      const { data } = await axios.post(`${getBaseURL()}/auth/token/refresh/`, {
         refresh: refreshToken,
       });
       storage.setAccessToken(data.access);
