@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout';
 import ErrorMessage from '../components/ErrorMessage';
 import { useAuth } from '../hooks/useAuth';
 import { formatError } from '../utils/formatError';
+import { storage } from '../utils/storage';
 
 import { isTelegram } from '../services/telegramAuth';
 
@@ -15,15 +16,23 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const tgError = new URLSearchParams(location.search).get('tg_error');
+
   if (isTelegram()) {
-    return (
-      <AuthLayout title="Acadium" subtitle="Telegram orqali avtomatik kirilmoqda...">
-        <div className="flex flex-col items-center justify-center py-8 space-y-4">
-          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-sm text-gray-500 animate-pulse">Hisobga kirilmoqda...</p>
-        </div>
-      </AuthLayout>
-    );
+    if (storage.getAccessToken()) {
+      return <Navigate to="/" replace />;
+    }
+    if (!tgError) {
+      return (
+        <AuthLayout title="Acadium" subtitle="Telegram orqali avtomatik kirilmoqda...">
+          <div className="flex flex-col items-center justify-center py-8 space-y-4">
+            <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-sm text-gray-500 animate-pulse">Hisobga kirilmoqda...</p>
+          </div>
+        </AuthLayout>
+      );
+    }
   }
 
   const handleSubmit = async (e) => {

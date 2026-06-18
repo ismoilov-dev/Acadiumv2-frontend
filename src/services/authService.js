@@ -1,7 +1,7 @@
 import apiClient from '../api/apiClient';
 import { storage } from '../utils/storage';
 
-const AUTH_BASE = '/api/auth';
+const AUTH_BASE = 'auth';
 
 export const authService = {
   register: async (data) => {

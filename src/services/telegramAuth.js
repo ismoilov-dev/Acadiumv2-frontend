@@ -1,35 +1,51 @@
-import { storage } from '../utils/storage'
+import axios from 'axios';
+import { storage } from '../utils/storage';
 
-export const isTelegram = () =>
-  !!(window.Telegram?.WebApp?.initData)
+export const isTelegram = () => {
+  return !!window.Telegram?.WebApp?.initData;
+};
 
 export const telegramLogin = async () => {
-  const tg = window.Telegram.WebApp
-  tg.ready()
-  tg.expand()
+  const tg = window.Telegram?.WebApp;
 
-  const init_data = tg.initData
-  if (!init_data) throw new Error('Telegram initData mavjud emas')
+  if (!tg) {
+    throw new Error('Telegram WebApp topilmadi');
+  }
 
-  // Get API base URL from environment or construct it
-  const apiBase = import.meta.env.VITE_API_BASE_URL || `${window.location.origin}/api`;
+  tg.ready();
+  tg.expand();
 
-  const res = await fetch(`${apiBase}/auth/telegram/`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ init_data })
-  })
+  const init_data = tg.initData;
 
-  if (!res.ok) throw new Error('Telegram auth xato')
+  if (!init_data) {
+    throw new Error('Telegram initData mavjud emas');
+  }
 
-  const data = await res.json()
+  const API_BASE =
+    import.meta.env.VITE_API_BASE_URL ||
+    'https://acadium.duckdns.org';
 
-  // storage util ishlatiladi — to'g'ri key lar bilan
-  storage.setAccessToken(data.access)
-  storage.setRefreshToken(data.refresh)
-  storage.setUser(data.user)
+  console.log('Telegram Auth URL:', `${API_BASE}/api/auth/telegram/`);
 
-  return data
-}
+  const response = await axios.post(
+    `${API_BASE}/api/auth/telegram/`,
+    {
+      init_data,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+
+  const data = response.data;
+
+  storage.setAccessToken(data.access);
+  storage.setRefreshToken(data.refresh);
+  storage.setUser(data.user);
+
+  return data;
+};
 
 export const initTelegramAuth = telegramLogin;

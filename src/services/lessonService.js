@@ -1,6 +1,6 @@
 import apiClient from '../api/apiClient';
 
-const LESSONS_BASE = '/api/lessons';
+const LESSONS_BASE = 'lessons';
 
 export const lessonService = {
   list: async () => {

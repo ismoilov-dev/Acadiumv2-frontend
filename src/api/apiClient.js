@@ -1,11 +1,14 @@
 import axios from 'axios';
 import { storage } from '../utils/storage';
 
+const normalizeBaseURL = (url) => url.replace(/\/+$/, '');
+
 const getBaseURL = () => {
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
+  const raw = import.meta.env.VITE_API_BASE_URL?.trim();
+  if (raw) {
+    const normalized = normalizeBaseURL(raw);
+    return normalized.endsWith('/api') ? normalized : `${normalized}/api`;
   }
-  // For development: use current domain + /api
   return `${window.location.origin}/api`;
 };
 
