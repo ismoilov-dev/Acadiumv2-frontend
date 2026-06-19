@@ -218,10 +218,10 @@ export default function ChatInterface() {
   const handleShare = () => {
     if (!lesson) return;
     
-    const publicUrl = `https://acadium.duckdns.org/lesson/${lesson.id}`;
-    const text = `📚 New lesson generated with Acadium\n\nTopic: ${lesson.title || lesson.prompt || 'New Lesson'}\n\nView lesson:\n${publicUrl}\n\nCreated with Acadium AI`;
+    const publicUrl = `https://acadium.duckdns.org/public/lesson/${lesson.id}`;
+    const text = `📚 ${lesson.title || 'Ochiq dars'}\n\nOpen lesson:\n${publicUrl}`;
     
-    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(publicUrl)}&text=${encodeURIComponent(text)}`;
+    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(publicUrl)}&text=${encodeURIComponent(`📚 ${lesson.title || 'Ochiq dars'}\n\nOpen lesson:`)}`;
     
     if (window.Telegram?.WebApp?.openTelegramLink) {
       window.Telegram.WebApp.openTelegramLink(tgUrl);
@@ -479,27 +479,27 @@ export default function ChatInterface() {
                 </div>
                 <div className="text-xs font-medium text-slate-400">{progress}% • {progress < 30 ? 'Analyzing prompt' : progress < 60 ? 'Structuring lesson' : progress < 90 ? 'Generating content' : 'Finalizing'}</div>
               </div>
-            ) : (
+            ) : (lesson?.status === 'completed' && id) ? (
               <div className="flex flex-col gap-3">
-                {/* Action Buttons Container */}
-                {lesson?.status === 'completed' && id && (
-                  <div className="flex flex-wrap gap-2 justify-center pb-2">
-                    <button
-                      onClick={handleShare}
-                      className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors font-medium text-sm border border-indigo-100"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                      Share
-                    </button>
-                    <button
-                      onClick={handleDownload}
-                      className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 text-slate-700 rounded-full hover:bg-slate-100 transition-colors font-medium text-sm border border-slate-200"
-                    >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                      PPTX
-                    </button>
-                  </div>
-                )}
+                <div className="flex gap-2 justify-center pb-2">
+                  <button
+                    onClick={handleShare}
+                    className="flex-1 bg-indigo-600 text-white rounded-xl py-3.5 font-medium flex items-center justify-center gap-2 hover:bg-indigo-700 transition-colors shadow-sm text-sm sm:text-base"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                    Share Lesson
+                  </button>
+                  <button
+                    onClick={handleDownload}
+                    className="flex-1 bg-slate-100 text-slate-800 rounded-xl py-3.5 font-medium flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    PPTX Download
+                  </button>
+                </div>
+              </div>
+            ) : (!id) ? (
+              <div className="flex flex-col gap-3">
                 <form onSubmit={handleGenerate} className="relative flex items-end gap-2 bg-white rounded-2xl border border-slate-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all p-1.5 sm:p-2">
                 <textarea
                   value={prompt}
@@ -525,12 +525,11 @@ export default function ChatInterface() {
                   <svg className="w-5 h-5 translate-x-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </button>
                 </form>
+                <p className="text-center text-[10px] sm:text-xs text-slate-400 mt-1">
+                  AI xato qilishi mumkin. O'quvchilarga taqdim etishdan oldin tekshirib chiqing.
+                </p>
               </div>
-            )}
-
-            <p className="text-center text-[10px] sm:text-xs text-slate-400 mt-2">
-              AI xato qilishi mumkin. O'quvchilarga taqdim etishdan oldin tekshirib chiqing.
-            </p>
+            ) : null}
           </div>
         </div>
 
