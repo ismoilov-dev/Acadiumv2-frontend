@@ -94,11 +94,7 @@ export default function PublicLesson() {
           </div>
           <span className="font-bold text-slate-800 tracking-tight">Acadium AI</span>
         </div>
-        {/* <div className="ml-auto flex items-center gap-2">
-          <Link to="/" className="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">
-            {/* O'zingiz yaratish */}
-          </Link>
-        </div> */}
+
       </header>
 
       {/* Main Content Area */}
@@ -131,12 +127,7 @@ export default function PublicLesson() {
             </div>
           </div>
 
-          {/* <div className="text-center mt-8">
-            {/* <p className="text-sm text-slate-500 mb-3">Siz ham shunday interaktiv darslar yaratmoqchimisiz?</p> */}
-            <Link to="/" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium shadow-sm">
-               Boshlash
-            </Link>
-          </div> */}
+
 
         </div>
       </main>
