@@ -1,6 +1,6 @@
 // src/hooks/useLessonGeneration.js
 import { useState, useEffect, useRef, useCallback } from "react";
-import api from "../services/api"; // sizning mavjud axios instance
+import apiClient from "../api/apiClient";
 
 const POLL_MS = 3000;
 const MAX_MS  = 10 * 60 * 1000;
@@ -28,7 +28,7 @@ export function useLessonGeneration() {
 
   const fetchLesson = useCallback(async (id) => {
     try {
-      const { data } = await api.get(`/lessons/${id}/`);
+      const { data } = await apiClient.get(`/lessons/${id}/`);
       setLesson(data);
     } catch {
       setError("Dars yuklanmadi. Sahifani yangilang.");
@@ -45,7 +45,7 @@ export function useLessonGeneration() {
     }
 
     try {
-      const { data } = await api.get(`/lessons/${id}/status/`);
+      const { data } = await apiClient.get(`/lessons/${id}/status/`);
       setTaskStatus(data.status);
       setProgress(data.progress    ?? 0);
       setStep(data.current_step    ?? "");
@@ -91,7 +91,7 @@ export function useLessonGeneration() {
     setTaskStatus(null);
 
     try {
-      const { data } = await api.post("/lessons/generate/", params);
+      const { data } = await apiClient.post("/lessons/generate/", params);
       const id = data.lesson_id;
 
       localStorage.setItem("pending_lesson_id", String(id));
