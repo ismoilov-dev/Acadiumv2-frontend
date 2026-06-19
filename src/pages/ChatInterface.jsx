@@ -193,8 +193,8 @@ export default function ChatInterface() {
              className="flex items-center gap-3 w-full px-2 py-2 rounded-lg hover:bg-slate-200 transition-colors text-left group"
            >
               <div className="h-8 w-8 rounded-full overflow-hidden bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600 shrink-0 border border-slate-300 group-hover:border-indigo-400 transition-colors">
-                {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                {user?.profile_image ? (
+                  <img src={user.profile_image} alt="Avatar" className="h-full w-full object-cover" />
                 ) : (
                   (user?.full_name || user?.email)?.[0]?.toUpperCase()
                 )}
