@@ -3,6 +3,7 @@ import ProtectedRoute from '../components/ProtectedRoute';
 import ChatInterface from '../pages/ChatInterface';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
+import PublicLesson from '../pages/PublicLesson';
 import { storage } from '../utils/storage';
 import { isTelegram } from '../App';
 
@@ -19,6 +20,10 @@ export default function AppRouter() {
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
 
+      {/* Public Share Route */}
+      <Route path="/lesson/:id" element={<PublicLesson />} />
+
+      {/* Protected Routes */}
       <Route path="/" element={<ProtectedRoute><ChatInterface /></ProtectedRoute>} />
       <Route path="/lessons/:id" element={<ProtectedRoute><ChatInterface /></ProtectedRoute>} />
 

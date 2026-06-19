@@ -24,8 +24,18 @@ export const lessonService = {
     return response.data;
   },
 
+  getPublic: async (id) => {
+    const response = await apiClient.get(`${LESSONS_BASE}/public/${id}/`);
+    return response.data;
+  },
+
   delete: async (id) => {
     await apiClient.delete(`${LESSONS_BASE}/${id}/`);
+  },
+
+  update: async (id, data) => {
+    const response = await apiClient.patch(`${LESSONS_BASE}/${id}/`, data);
+    return response.data;
   },
 
   download: async (id, filename = 'lesson.pptx') => {

@@ -30,6 +30,13 @@ export default function ChatInterface() {
   const [generateError, setGenerateError] = useState('');
   const [progress, setProgress] = useState(0);
 
+  // Context Menu and Modals state
+  const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0, lessonId: null, lessonTitle: '' });
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [renameTitle, setRenameTitle] = useState('');
+  const [actionLesson, setActionLesson] = useState(null);
+
   const bottomRef = useRef(null);
 
   // Fetch history
@@ -223,6 +230,62 @@ export default function ChatInterface() {
     }
   };
 
+  const handleContextMenu = (e, item) => {
+    e.preventDefault();
+    setContextMenu({
+      visible: true,
+      x: e.clientX,
+      y: e.clientY,
+      lessonId: item.id,
+      lessonTitle: item.title,
+    });
+  };
+
+  let longPressTimer;
+  const handleTouchStart = (e, item) => {
+    longPressTimer = setTimeout(() => {
+      const touch = e.touches[0];
+      setContextMenu({ visible: true, x: touch.clientX, y: touch.clientY, lessonId: item.id, lessonTitle: item.title });
+    }, 500);
+  };
+  const handleTouchEnd = () => { if (longPressTimer) clearTimeout(longPressTimer); };
+  const handleTouchMove = () => { if (longPressTimer) clearTimeout(longPressTimer); };
+
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu({ ...contextMenu, visible: false });
+    window.addEventListener('click', handleClickOutside);
+    return () => window.removeEventListener('click', handleClickOutside);
+  }, [contextMenu]);
+
+  const handleDeleteLesson = async () => {
+    if (!actionLesson) return;
+    try {
+      await lessonService.delete(actionLesson.id);
+      setHistory(prev => prev.filter(l => l.id !== actionLesson.id));
+      setDeleteModalOpen(false);
+      if (id === actionLesson.id.toString()) {
+        navigate('/');
+      }
+    } catch (err) {
+      alert(formatError(err));
+    }
+  };
+
+  const handleRenameLesson = async (e) => {
+    e.preventDefault();
+    if (!actionLesson || !renameTitle.trim()) return;
+    try {
+      await lessonService.update(actionLesson.id, { title: renameTitle });
+      setHistory(prev => prev.map(l => l.id === actionLesson.id ? { ...l, title: renameTitle } : l));
+      if (id === actionLesson.id.toString() && lesson) {
+        setLesson({ ...lesson, title: renameTitle });
+      }
+      setRenameModalOpen(false);
+    } catch (err) {
+      alert(formatError(err));
+    }
+  };
+
   return (
     <div className="flex h-[100dvh] w-full bg-slate-50 overflow-hidden font-sans text-slate-900">
 
@@ -275,6 +338,10 @@ export default function ChatInterface() {
                 key={item.id}
                 to={`/lessons/${item.id}`}
                 onClick={() => setIsSidebarOpen(false)}
+                onContextMenu={(e) => handleContextMenu(e, item)}
+                onTouchStart={(e) => handleTouchStart(e, item)}
+                onTouchEnd={handleTouchEnd}
+                onTouchMove={handleTouchMove}
                 className={`block w-full rounded-lg px-3 py-2.5 text-sm transition-colors text-left truncate ${
                   id === item.id.toString() ? 'bg-indigo-100 text-indigo-900 font-medium' : 'text-slate-700 hover:bg-slate-200/70'
                 }`}
@@ -379,25 +446,6 @@ export default function ChatInterface() {
                               slides={lesson.slides}
                               assessment={lesson.assessment}
                             />
-                            {/* Share and PPTX Actions */}
-                            {lesson.status === 'completed' && (
-                              <div className="mt-8 flex flex-wrap gap-3 pt-6 border-t border-slate-100">
-                                <button
-                                  onClick={handleShare}
-                                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium text-sm shadow-sm"
-                                >
-                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                                  Share Lesson
-                                </button>
-                                <button
-                                  onClick={handleDownload}
-                                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-50 text-indigo-700 rounded-xl hover:bg-indigo-100 transition-colors font-medium text-sm"
-                                >
-                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                                  PPTX
-                                </button>
-                              </div>
-                            )}
                           </div>
                         )}
                       </div>
@@ -432,7 +480,27 @@ export default function ChatInterface() {
                 <div className="text-xs font-medium text-slate-400">{progress}% • {progress < 30 ? 'Analyzing prompt' : progress < 60 ? 'Structuring lesson' : progress < 90 ? 'Generating content' : 'Finalizing'}</div>
               </div>
             ) : (
-              <form onSubmit={handleGenerate} className="relative flex items-end gap-2 bg-white rounded-2xl border border-slate-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all p-1.5 sm:p-2">
+              <div className="flex flex-col gap-3">
+                {/* Action Buttons Container */}
+                {lesson?.status === 'completed' && id && (
+                  <div className="flex flex-wrap gap-2 justify-center pb-2">
+                    <button
+                      onClick={handleShare}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 rounded-full hover:bg-indigo-100 transition-colors font-medium text-sm border border-indigo-100"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                      Share
+                    </button>
+                    <button
+                      onClick={handleDownload}
+                      className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 text-slate-700 rounded-full hover:bg-slate-100 transition-colors font-medium text-sm border border-slate-200"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                      PPTX
+                    </button>
+                  </div>
+                )}
+                <form onSubmit={handleGenerate} className="relative flex items-end gap-2 bg-white rounded-2xl border border-slate-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all p-1.5 sm:p-2">
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
@@ -472,6 +540,96 @@ export default function ChatInterface() {
         isOpen={isProfileOpen} 
         onClose={() => setIsProfileOpen(false)} 
       />
+
+      {/* Context Menu */}
+      {contextMenu.visible && (
+        <div 
+          className="fixed z-50 min-w-[160px] bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden py-1"
+          style={{ top: contextMenu.y, left: contextMenu.x }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button 
+            className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition-colors flex items-center gap-2"
+            onClick={() => {
+              setActionLesson({ id: contextMenu.lessonId, title: contextMenu.lessonTitle });
+              setRenameTitle(contextMenu.lessonTitle);
+              setRenameModalOpen(true);
+              setContextMenu({ ...contextMenu, visible: false });
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+            Rename
+          </button>
+          <div className="h-px bg-slate-100 my-1"></div>
+          <button 
+            className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+            onClick={() => {
+              setActionLesson({ id: contextMenu.lessonId, title: contextMenu.lessonTitle });
+              setDeleteModalOpen(true);
+              setContextMenu({ ...contextMenu, visible: false });
+            }}
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+            Delete
+          </button>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {deleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">Delete lesson?</h3>
+            <p className="text-slate-500 text-sm mb-6">This action cannot be undone.</p>
+            <div className="flex gap-3 justify-end">
+              <button 
+                onClick={() => setDeleteModalOpen(false)}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteLesson}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-red-600 hover:bg-red-700 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rename Modal */}
+      {renameModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-opacity">
+          <form onSubmit={handleRenameLesson} className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">Rename lesson</h3>
+            <input 
+              type="text" 
+              value={renameTitle}
+              onChange={(e) => setRenameTitle(e.target.value)}
+              className="w-full px-4 py-2 rounded-xl border border-slate-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 mb-6 text-sm outline-none"
+              autoFocus
+            />
+            <div className="flex gap-3 justify-end">
+              <button 
+                type="button"
+                onClick={() => setRenameModalOpen(false)}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit"
+                disabled={!renameTitle.trim()}
+                className="px-4 py-2 rounded-xl text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+              >
+                Rename
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </div>
   );
 }
