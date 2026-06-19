@@ -41,10 +41,7 @@ export const authService = {
   },
 
   updateProfile: async (data) => {
-    const isFormData = data instanceof FormData;
-    const response = await apiClient.patch(`${AUTH_BASE}/profile/`, data, {
-      headers: isFormData ? { 'Content-Type': 'multipart/form-data' } : undefined,
-    });
+    const response = await apiClient.patch(`${AUTH_BASE}/profile/`, data);
     storage.setUser(response.data);
     return response.data;
   },

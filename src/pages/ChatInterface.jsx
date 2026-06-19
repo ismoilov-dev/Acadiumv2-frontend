@@ -28,6 +28,7 @@ export default function ChatInterface() {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generateError, setGenerateError] = useState('');
+  const [progress, setProgress] = useState(0);
 
   const bottomRef = useRef(null);
 
@@ -89,6 +90,26 @@ export default function ChatInterface() {
     };
   }, [id]);
 
+  // Simulate progress when generating
+  useEffect(() => {
+    let interval;
+    const isActive = isGenerating || lesson?.status === 'processing' || lesson?.status === 'pending';
+    
+    if (isActive) {
+      interval = setInterval(() => {
+        setProgress(prev => {
+          if (prev >= 90) return 90;
+          return prev + Math.floor(Math.random() * 5) + 1;
+        });
+      }, 1000);
+    } else if (lesson?.status === 'completed') {
+      setProgress(100);
+    } else {
+      setProgress(0);
+    }
+    return () => clearInterval(interval);
+  }, [isGenerating, lesson?.status]);
+
   // Scroll to bottom when lesson updates
   useEffect(() => {
     if (bottomRef.current) {
@@ -96,19 +117,20 @@ export default function ChatInterface() {
     }
   }, [lesson, lessonLoading]);
 
-  // Generate new lesson
   const handleGenerate = async (e) => {
     e.preventDefault();
-    if (!prompt.trim()) return;
+    if (!prompt.trim() || isGenerating) return;
 
     setIsGenerating(true);
     setGenerateError('');
+    setProgress(0);
     try {
       const data = await lessonService.generate({ prompt });
       setPrompt('');
-      setIsGenerating(false);
       navigate(`/lessons/${data.id}`);
       fetchHistory(); // Optimistic update
+      // We deliberately keep isGenerating true here to prevent flickering. 
+      // It will be reset to false when fetchLesson completes.
     } catch (err) {
       setGenerateError(formatError(err));
       setIsGenerating(false);
@@ -122,6 +144,21 @@ export default function ChatInterface() {
       alert('✅ PPTX fayl Telegram chatga yuborildi.');
     } catch (err) {
       alert(formatError(err));
+    }
+  };
+
+  const handleShare = () => {
+    if (!lesson) return;
+    
+    const publicUrl = `${window.location.origin}/lessons/${lesson.id}`;
+    const text = `📚 New lesson generated with Acadium\n\nTopic: ${lesson.title || lesson.prompt || 'New Lesson'}\n\nView lesson:\n${publicUrl}\n\nCreated with Acadium AI`;
+    
+    const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(publicUrl)}&text=${encodeURIComponent(text)}`;
+    
+    if (window.Telegram?.WebApp?.openTelegramLink) {
+      window.Telegram.WebApp.openTelegramLink(tgUrl);
+    } else {
+      window.open(tgUrl, '_blank');
     }
   };
 
@@ -317,34 +354,59 @@ export default function ChatInterface() {
                 <ErrorMessage message={generateError} />
               </div>
             )}
-            <form onSubmit={handleGenerate} className="relative flex items-end gap-2 bg-white rounded-2xl border border-slate-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all p-1.5 sm:p-2">
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleGenerate(e);
-                  }
-                }}
-                placeholder="Dars yaratish uchun prompt yozing..."
-                className="w-full resize-none bg-transparent border-0 py-2.5 px-3 text-sm text-slate-900 focus:ring-0 max-h-32 scrollbar-thin outline-none"
-                rows="1"
-                disabled={isGenerating}
-                style={{ minHeight: '44px' }}
-              />
-              <button
-                type="submit"
-                disabled={!prompt.trim() || isGenerating}
-                className="flex shrink-0 items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:bg-slate-300 transition-colors"
-              >
-                {isGenerating ? (
-                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            
+            {(isGenerating || lesson?.status === 'processing' || lesson?.status === 'pending') ? (
+              <div className="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 sm:p-5 flex flex-col items-center justify-center space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                  <span className="font-semibold text-indigo-700">Generating lesson...</span>
+                </div>
+                <p className="text-xs sm:text-sm text-slate-500">AI is preparing your lesson.</p>
+                <div className="w-full bg-slate-100 rounded-full h-2 mt-2 overflow-hidden">
+                   <div className="bg-indigo-600 h-2 rounded-full transition-all duration-500 ease-out" style={{ width: `${progress}%` }}></div>
+                </div>
+                <div className="text-xs font-medium text-slate-400">{progress}% • {progress < 30 ? 'Analyzing prompt' : progress < 60 ? 'Structuring lesson' : progress < 90 ? 'Generating content' : 'Finalizing'}</div>
+              </div>
+            ) : (
+              <form onSubmit={handleGenerate} className="relative flex items-end gap-2 bg-white rounded-2xl border border-slate-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all p-1.5 sm:p-2">
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      if (lesson?.status !== 'completed') handleGenerate(e);
+                    }
+                  }}
+                  placeholder={lesson?.status === 'completed' ? "Dars yaratildi. Yangi dars uchun yon paneldan bosing." : "Dars yaratish uchun prompt yozing..."}
+                  className="w-full resize-none bg-transparent border-0 py-2.5 px-3 text-sm text-slate-900 focus:ring-0 max-h-32 scrollbar-thin outline-none disabled:text-slate-400 disabled:cursor-not-allowed"
+                  rows="1"
+                  disabled={isGenerating || lesson?.status === 'completed'}
+                  style={{ minHeight: '44px' }}
+                />
+                
+                {lesson?.status === 'completed' ? (
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    className="flex shrink-0 items-center justify-center px-4 h-10 sm:h-11 rounded-xl bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition-colors gap-2 font-medium text-sm whitespace-nowrap"
+                  >
+                    <span className="text-lg">📤</span>
+                    <span className="hidden sm:inline">Share Lesson</span>
+                    <span className="sm:hidden">Share</span>
+                  </button>
                 ) : (
-                   <svg className="w-5 h-5 translate-x-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
+                  <button
+                    type="submit"
+                    disabled={!prompt.trim() || isGenerating}
+                    className="flex shrink-0 items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:bg-slate-300 transition-colors"
+                  >
+                    <svg className="w-5 h-5 translate-x-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
+                  </button>
                 )}
-              </button>
-            </form>
+              </form>
+            )}
+
             <p className="text-center text-[10px] sm:text-xs text-slate-400 mt-2">
               AI xato qilishi mumkin. O'quvchilarga taqdim etishdan oldin tekshirib chiqing.
             </p>
