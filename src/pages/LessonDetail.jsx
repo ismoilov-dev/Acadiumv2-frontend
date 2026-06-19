@@ -20,17 +20,34 @@ export default function LessonDetail() {
   const [shareLink, setShareLink] = useState('');
 
   useEffect(() => {
+    let timeoutId;
+    let isMounted = true;
+
     const fetchLesson = async () => {
       try {
         const data = await lessonService.get(id);
-        setLesson(data);
+        if (isMounted) {
+          setLesson(data);
+          setLoading(false);
+
+          if (data.status === 'processing' || data.status === 'pending') {
+            timeoutId = setTimeout(fetchLesson, 3000);
+          }
+        }
       } catch (err) {
-        setError(formatError(err));
-      } finally {
-        setLoading(false);
+        if (isMounted) {
+          setError(formatError(err));
+          setLoading(false);
+        }
       }
     };
+    
     fetchLesson();
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [id]);
 
   const handleDelete = async () => {

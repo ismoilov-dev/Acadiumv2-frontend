@@ -50,6 +50,11 @@ apiClient.interceptors.response.use(
     const refreshToken = storage.getRefreshToken();
     if (!refreshToken) {
       storage.clearAuth();
+      if (window.Telegram?.WebApp?.initData) {
+        window.location.href = '/';
+      } else {
+        window.location.href = '/login';
+      }
       return Promise.reject(error);
     }
 
@@ -76,7 +81,11 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       processQueue(refreshError, null);
       storage.clearAuth();
-      window.location.href = '/login';
+      if (window.Telegram?.WebApp?.initData) {
+        window.location.href = '/';
+      } else {
+        window.location.href = '/login';
+      }
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
