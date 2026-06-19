@@ -19,6 +19,7 @@ export default function App() {
           } catch (err) {
             console.error('Telegram auth failed:', err);
             setError('Telegram authentication failed');
+            return;
           }
         }
 

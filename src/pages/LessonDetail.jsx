@@ -17,8 +17,6 @@ export default function LessonDetail() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [actionLoading, setActionLoading] = useState('');
-  const [shareLink, setShareLink] = useState('');
-
   useEffect(() => {
     let timeoutId;
     let isMounted = true;
@@ -63,18 +61,6 @@ export default function LessonDetail() {
     }
   };
 
-  const handleShare = async () => {
-    setActionLoading('share');
-    try {
-      const data = await lessonService.share(id);
-      setShareLink(data.share_link);
-      setLesson((prev) => ({ ...prev, is_shared: true }));
-    } catch (err) {
-      setError(formatError(err));
-    } finally {
-      setActionLoading('');
-    }
-  };
 
   const handleDownload = async () => {
     setActionLoading('download');
@@ -90,10 +76,6 @@ export default function LessonDetail() {
     }
   };
 
-  const copyShareLink = () => {
-    const link = shareLink || `${window.location.origin}/public/${lesson.share_token}`;
-    navigator.clipboard.writeText(link);
-  };
 
   if (loading) return <MainLayout><LoadingSpinner message="Dars yuklanmoqda..." /></MainLayout>;
   if (error && !lesson) return <MainLayout><ErrorMessage message={error} /></MainLayout>;
@@ -145,14 +127,6 @@ export default function LessonDetail() {
               >
                 {actionLoading === 'download' ? 'Yuklanmoqda...' : 'PPTX yuklab olish'}
               </button>
-              <button
-                type="button"
-                onClick={handleShare}
-                disabled={!!actionLoading}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50 tap-target flex items-center justify-center"
-              >
-                {actionLoading === 'share' ? 'Ulashilmoqda...' : 'Ulashish'}
-              </button>
             </>
           )}
           <button
@@ -166,22 +140,6 @@ export default function LessonDetail() {
         </div>
 
 
-        {(shareLink || lesson.is_shared) && (
-          <div className="mt-4 flex items-center gap-2 rounded-md border border-green-200 bg-green-50 p-3">
-            <input
-              readOnly
-              value={shareLink || `${window.location.origin}/public/${lesson.share_token}`}
-              className="flex-1 bg-transparent text-sm text-green-800 outline-none"
-            />
-            <button
-              type="button"
-              onClick={copyShareLink}
-              className="rounded-md bg-green-600 px-3 py-1 text-xs font-medium text-white hover:bg-green-700"
-            >
-              Nusxalash
-            </button>
-          </div>
-        )}
       </div>
 
       <LessonContent

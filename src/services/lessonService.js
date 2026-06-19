@@ -28,11 +28,6 @@ export const lessonService = {
     await apiClient.delete(`${LESSONS_BASE}/${id}/`);
   },
 
-  share: async (id) => {
-    const response = await apiClient.post(`${LESSONS_BASE}/${id}/share/`);
-    return response.data;
-  },
-
   download: async (id, filename = 'lesson.pptx') => {
     const response = await apiClient.get(`${LESSONS_BASE}/${id}/download/`, {
       responseType: 'blob',
@@ -49,11 +44,6 @@ export const lessonService = {
 
   sendToTelegram: async (id) => {
     const response = await apiClient.post(`${LESSONS_BASE}/${id}/send_telegram/`);
-    return response.data;
-  },
-
-  getPublic: async (token) => {
-    const response = await apiClient.get(`${LESSONS_BASE}/public/${token}/`);
     return response.data;
   },
 };

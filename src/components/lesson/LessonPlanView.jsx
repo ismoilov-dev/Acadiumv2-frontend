@@ -50,14 +50,32 @@ export default function LessonPlanView({ plan }) {
           <div className="mt-5">
             <h3 className="mb-3 text-sm font-semibold text-gray-800">Materiallar</h3>
             <div className="flex flex-wrap gap-2">
-              {materials.map((material, i) => (
-                <span
-                  key={i}
-                  className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-700"
-                >
-                  {material}
-                </span>
-              ))}
+              {materials.map((material, i) => {
+                if (typeof material === 'string') {
+                  return (
+                    <span
+                      key={i}
+                      className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-700"
+                    >
+                      {material}
+                    </span>
+                  );
+                }
+                return (
+                  <a
+                    key={i}
+                    href={material.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100 transition-colors"
+                  >
+                    <span>{material.title}</span>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                  </a>
+                );
+              })}
             </div>
           </div>
         )}

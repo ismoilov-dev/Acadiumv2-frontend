@@ -7,11 +7,11 @@ import Profile from '../pages/Profile';
 import LessonList from '../pages/LessonList';
 import LessonCreate from '../pages/LessonCreate';
 import LessonDetail from '../pages/LessonDetail';
-import PublicLesson from '../pages/PublicLesson';
 import { storage } from '../utils/storage';
+import { isTelegram } from '../services/telegramAuth';
 
 function GuestRoute({ children }) {
-  if (storage.getAccessToken()) {
+  if (storage.getAccessToken() || isTelegram()) {
     return <Navigate to="/" replace />;
   }
   return children;
@@ -22,7 +22,6 @@ export default function AppRouter() {
     <Routes>
       <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
-      <Route path="/public/:token" element={<PublicLesson />} />
 
       <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
