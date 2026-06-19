@@ -48,6 +48,24 @@ export default function ChatInterface() {
     fetchHistory();
   }, []);
 
+  // Restore state from localStorage on mount
+  useEffect(() => {
+    const savedStr = localStorage.getItem('acadium_generation');
+    if (savedStr) {
+      try {
+        const saved = JSON.parse(savedStr);
+        if (saved.lesson_id && (saved.generation_status === 'processing' || saved.generation_status === 'pending')) {
+          setProgress(saved.progress || 0);
+          if (!id) {
+            navigate(`/lessons/${saved.lesson_id}`);
+          }
+        }
+      } catch (e) {
+        console.error('Failed to parse generation state', e);
+      }
+    }
+  }, [id, navigate]);
+
   // Fetch & poll active lesson
   useEffect(() => {
     if (!id) {
@@ -57,27 +75,47 @@ export default function ChatInterface() {
       return;
     }
 
+    setLesson(null);
+    setLessonLoading(true);
+    setLessonError('');
+
     let timeoutId;
     let isMounted = true;
 
     const fetchLesson = async () => {
-      setLessonLoading(!lesson);
       try {
         const data = await lessonService.get(id);
-        if (isMounted) {
-          setLesson(data);
-          setLessonLoading(false);
+        if (!isMounted) return;
 
-          if (data.status === 'processing' || data.status === 'pending') {
-            timeoutId = setTimeout(fetchLesson, 3000);
-          } else if (data.status === 'completed' || data.status === 'failed') {
-            fetchHistory(); // Refresh history to update titles
-          }
+        setLesson(data);
+        setLessonLoading(false);
+        
+        // Make sure isGenerating is forcefully reset if the lesson is completed or failed
+        if (data.status === 'completed' || data.status === 'failed') {
+           setIsGenerating(false);
+        }
+
+        if (data.status === 'processing' || data.status === 'pending') {
+          // Keep localStorage updated with actual server status
+          const savedStr = localStorage.getItem('acadium_generation');
+          const saved = savedStr ? JSON.parse(savedStr) : { progress: 0 };
+          localStorage.setItem('acadium_generation', JSON.stringify({
+            ...saved,
+            lesson_id: data.id,
+            generation_status: data.status,
+          }));
+          
+          timeoutId = setTimeout(fetchLesson, 3000);
+        } else if (data.status === 'completed' || data.status === 'failed') {
+          localStorage.removeItem('acadium_generation');
+          fetchHistory(); // Refresh history to update titles
         }
       } catch (err) {
         if (isMounted) {
           setLessonError(formatError(err));
           setLessonLoading(false);
+          setIsGenerating(false);
+          localStorage.removeItem('acadium_generation');
         }
       }
     };
@@ -98,8 +136,21 @@ export default function ChatInterface() {
     if (isActive) {
       interval = setInterval(() => {
         setProgress(prev => {
-          if (prev >= 90) return 90;
-          return prev + Math.floor(Math.random() * 5) + 1;
+          const newProgress = prev >= 90 ? 90 : prev + Math.floor(Math.random() * 5) + 1;
+          const currentStep = newProgress < 30 ? 'Analyzing prompt' : newProgress < 60 ? 'Structuring lesson' : newProgress < 90 ? 'Generating content' : 'Finalizing';
+          
+          // Persist incremental progress safely
+          const savedStr = localStorage.getItem('acadium_generation');
+          if (savedStr) {
+            try {
+              const saved = JSON.parse(savedStr);
+              saved.progress = newProgress;
+              saved.current_step = currentStep;
+              localStorage.setItem('acadium_generation', JSON.stringify(saved));
+            } catch (e) {}
+          }
+          
+          return newProgress;
         });
       }, 1000);
     } else if (lesson?.status === 'completed') {
@@ -127,6 +178,15 @@ export default function ChatInterface() {
     try {
       const data = await lessonService.generate({ prompt });
       setPrompt('');
+      
+      // Store initial generation state
+      localStorage.setItem('acadium_generation', JSON.stringify({
+        lesson_id: data.id,
+        generation_status: 'pending',
+        progress: 0,
+        current_step: 'Analyzing prompt'
+      }));
+
       navigate(`/lessons/${data.id}`);
       fetchHistory(); // Optimistic update
       // We deliberately keep isGenerating true here to prevent flickering. 
@@ -134,6 +194,7 @@ export default function ChatInterface() {
     } catch (err) {
       setGenerateError(formatError(err));
       setIsGenerating(false);
+      localStorage.removeItem('acadium_generation');
     }
   };
 
@@ -150,7 +211,7 @@ export default function ChatInterface() {
   const handleShare = () => {
     if (!lesson) return;
     
-    const publicUrl = `${window.location.origin}/lessons/${lesson.id}`;
+    const publicUrl = `https://acadium.duckdns.org/lesson/${lesson.id}`;
     const text = `📚 New lesson generated with Acadium\n\nTopic: ${lesson.title || lesson.prompt || 'New Lesson'}\n\nView lesson:\n${publicUrl}\n\nCreated with Acadium AI`;
     
     const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(publicUrl)}&text=${encodeURIComponent(text)}`;
@@ -259,15 +320,6 @@ export default function ChatInterface() {
           <div className="flex-1 font-semibold text-slate-800 truncate">
             {id && lesson ? lesson.title : 'Yangi dars'}
           </div>
-          {lesson?.status === 'completed' && (
-            <button
-              onClick={handleDownload}
-              className="flex items-center gap-1.5 rounded-md bg-indigo-50 px-3 py-1.5 text-xs font-medium text-indigo-700 hover:bg-indigo-100 transition-colors"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-              PPTX
-            </button>
-          )}
         </header>
 
         {/* Chat Scroll Area */}
@@ -303,28 +355,20 @@ export default function ChatInterface() {
                 </div>
 
                 {/* AI Response Area */}
-                <div className="flex justify-start">
-                   <div className="flex items-start gap-4 max-w-full w-full">
-                      <div className="w-8 h-8 shrink-0 rounded-full bg-slate-900 flex items-center justify-center text-white shadow-sm mt-1 hidden sm:flex">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z" /></svg>
-                      </div>
-                      <div className="flex-1 bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 sm:p-6 shadow-sm overflow-hidden">
-                        {(lesson.status === 'processing' || lesson.status === 'pending') ? (
-                          <div className="flex items-center gap-3 text-slate-500 font-medium">
-                            <div className="animate-pulse flex gap-1">
-                              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-                              <div className="w-2 h-2 bg-indigo-500 rounded-full animation-delay-200"></div>
-                              <div className="w-2 h-2 bg-indigo-500 rounded-full animation-delay-400"></div>
-                            </div>
-                            <span className="text-sm">Dars generatsiya qilinmoqda, kuting...</span>
-                          </div>
-                        ) : lesson.status === 'failed' ? (
-                          <ErrorMessage message="Generatsiyada xatolik yuz berdi. Qaytadan urinib ko'ring." />
-                        ) : (
-                          <div className="w-full max-w-full prose prose-sm prose-indigo prose-slate">
-                            {/* Metadata Badges */}
-                            {(lesson.subject || lesson.grade) && (
-                               <div className="flex flex-wrap gap-2 mb-6">
+                {(lesson.status === 'completed' || lesson.status === 'failed') && (
+                  <div className="flex justify-start">
+                     <div className="flex items-start gap-4 max-w-full w-full">
+                        <div className="w-8 h-8 shrink-0 rounded-full bg-slate-900 flex items-center justify-center text-white shadow-sm mt-1 hidden sm:flex">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z" /></svg>
+                        </div>
+                        <div className="flex-1 bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 sm:p-6 shadow-sm overflow-hidden">
+                          {lesson.status === 'failed' ? (
+                            <ErrorMessage message="Generatsiyada xatolik yuz berdi. Qaytadan urinib ko'ring." />
+                          ) : (
+                            <div className="w-full max-w-full prose prose-sm prose-indigo prose-slate">
+                              {/* Metadata Badges */}
+                              {(lesson.subject || lesson.grade) && (
+                                 <div className="flex flex-wrap gap-2 mb-6">
                                  {lesson.subject && <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold capitalize">{lesson.subject}</span>}
                                  {lesson.grade && <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold">{lesson.grade}-sinf</span>}
                                  {lesson.duration && <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold">{lesson.duration} daqiqa</span>}
@@ -335,11 +379,31 @@ export default function ChatInterface() {
                               slides={lesson.slides}
                               assessment={lesson.assessment}
                             />
+                            {/* Share and PPTX Actions */}
+                            {lesson.status === 'completed' && (
+                              <div className="mt-8 flex flex-wrap gap-3 pt-6 border-t border-slate-100">
+                                <button
+                                  onClick={handleShare}
+                                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium text-sm shadow-sm"
+                                >
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                                  Share Lesson
+                                </button>
+                                <button
+                                  onClick={handleDownload}
+                                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-50 text-indigo-700 rounded-xl hover:bg-indigo-100 transition-colors font-medium text-sm"
+                                >
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                  PPTX
+                                </button>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
                    </div>
                 </div>
+                )}
               </>
             ) : null}
             <div ref={bottomRef} />
@@ -375,35 +439,23 @@ export default function ChatInterface() {
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault();
-                      if (lesson?.status !== 'completed') handleGenerate(e);
+                      handleGenerate(e);
                     }
                   }}
-                  placeholder={lesson?.status === 'completed' ? "Dars yaratildi. Yangi dars uchun yon paneldan bosing." : "Dars yaratish uchun prompt yozing..."}
+                  placeholder="Yangi dars yaratish uchun prompt yozing..."
                   className="w-full resize-none bg-transparent border-0 py-2.5 px-3 text-sm text-slate-900 focus:ring-0 max-h-32 scrollbar-thin outline-none disabled:text-slate-400 disabled:cursor-not-allowed"
                   rows="1"
-                  disabled={isGenerating || lesson?.status === 'completed'}
+                  disabled={isGenerating}
                   style={{ minHeight: '44px' }}
                 />
                 
-                {lesson?.status === 'completed' ? (
-                  <button
-                    type="button"
-                    onClick={handleShare}
-                    className="flex shrink-0 items-center justify-center px-4 h-10 sm:h-11 rounded-xl bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 transition-colors gap-2 font-medium text-sm whitespace-nowrap"
-                  >
-                    <span className="text-lg">📤</span>
-                    <span className="hidden sm:inline">Share Lesson</span>
-                    <span className="sm:hidden">Share</span>
-                  </button>
-                ) : (
-                  <button
-                    type="submit"
-                    disabled={!prompt.trim() || isGenerating}
-                    className="flex shrink-0 items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:bg-slate-300 transition-colors"
-                  >
-                    <svg className="w-5 h-5 translate-x-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
-                  </button>
-                )}
+                <button
+                  type="submit"
+                  disabled={!prompt.trim() || isGenerating}
+                  className="flex shrink-0 items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:bg-slate-300 transition-colors"
+                >
+                  <svg className="w-5 h-5 translate-x-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
+                </button>
               </form>
             )}
 
