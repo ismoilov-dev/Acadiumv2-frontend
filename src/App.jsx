@@ -1,8 +1,12 @@
 import { BrowserRouter } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import AppRouter from './router';
-import { isTelegram, telegramLogin } from './services/telegramAuth';
+import { authService } from './services/authService';
 import { storage } from './utils/storage';
+
+export const isTelegram = () => {
+  return !!window.Telegram?.WebApp?.initData;
+};
 
 export default function App() {
   const [ready, setReady] = useState(false);
@@ -15,7 +19,8 @@ export default function App() {
 
         if (isTelegram() && !hasToken) {
           try {
-            await telegramLogin();
+            const initData = window.Telegram.WebApp.initData;
+            await authService.telegramLogin(initData);
           } catch (err) {
             console.error('Telegram auth failed:', err);
             setError('Telegram authentication failed');

@@ -9,6 +9,15 @@ export const authService = {
     return response.data;
   },
 
+  telegramLogin: async (initData) => {
+    const response = await apiClient.post(`${AUTH_BASE}/telegram/`, { init_data: initData });
+    const { access, refresh, user } = response.data;
+    storage.setAccessToken(access);
+    storage.setRefreshToken(refresh);
+    storage.setUser(user);
+    return response.data;
+  },
+
   login: async (email, password) => {
     const response = await apiClient.post(`${AUTH_BASE}/login/`, { email, password });
     const { access, refresh, user } = response.data;

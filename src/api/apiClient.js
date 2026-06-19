@@ -48,14 +48,40 @@ apiClient.interceptors.response.use(
     }
 
     const refreshToken = storage.getRefreshToken();
+    const tgInitData = window.Telegram?.WebApp?.initData;
+
     if (!refreshToken) {
-      storage.clearAuth();
-      if (window.Telegram?.WebApp?.initData) {
-        window.location.href = '/';
+      if (tgInitData) {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          }).then((token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            return apiClient(originalRequest);
+          });
+        }
+        originalRequest._retry = true;
+        isRefreshing = true;
+        try {
+          const { data } = await axios.post(`${getBaseURL()}/auth/telegram/`, { init_data: tgInitData });
+          storage.setAccessToken(data.access);
+          storage.setRefreshToken(data.refresh);
+          storage.setUser(data.user);
+          processQueue(null, data.access);
+          originalRequest.headers.Authorization = `Bearer ${data.access}`;
+          return apiClient(originalRequest);
+        } catch (tgError) {
+          processQueue(tgError, null);
+          storage.clearAuth();
+          return Promise.reject(tgError);
+        } finally {
+          isRefreshing = false;
+        }
       } else {
+        storage.clearAuth();
         window.location.href = '/login';
+        return Promise.reject(error);
       }
-      return Promise.reject(error);
     }
 
     if (isRefreshing) {
@@ -79,14 +105,26 @@ apiClient.interceptors.response.use(
       originalRequest.headers.Authorization = `Bearer ${data.access}`;
       return apiClient(originalRequest);
     } catch (refreshError) {
-      processQueue(refreshError, null);
-      storage.clearAuth();
-      if (window.Telegram?.WebApp?.initData) {
-        window.location.href = '/';
+      if (tgInitData) {
+        try {
+          const { data } = await axios.post(`${getBaseURL()}/auth/telegram/`, { init_data: tgInitData });
+          storage.setAccessToken(data.access);
+          storage.setRefreshToken(data.refresh);
+          storage.setUser(data.user);
+          processQueue(null, data.access);
+          originalRequest.headers.Authorization = `Bearer ${data.access}`;
+          return apiClient(originalRequest);
+        } catch (tgError) {
+          processQueue(tgError, null);
+          storage.clearAuth();
+          return Promise.reject(tgError);
+        }
       } else {
+        processQueue(refreshError, null);
+        storage.clearAuth();
         window.location.href = '/login';
+        return Promise.reject(refreshError);
       }
-      return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;
     }
