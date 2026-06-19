@@ -21,7 +21,7 @@ export default function AppRouter() {
       <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
 
       {/* Public Share Route */}
-      <Route path="/public/lesson/:id" element={<PublicLesson />} />
+      <Route path="/lesson/:id" element={<PublicLesson />} />
 
       {/* Protected Routes */}
       <Route path="/" element={<ProtectedRoute><ChatInterface /></ProtectedRoute>} />
