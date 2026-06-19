@@ -12,9 +12,9 @@ export default function PublicLesson() {
 
   useEffect(() => {
     if (!id) return;
-    
+
     let isMounted = true;
-    
+
     const fetchPublicLesson = async () => {
       try {
         setLoading(true);
@@ -22,10 +22,10 @@ export default function PublicLesson() {
         if (isMounted) {
           setLesson(data);
           setLoading(false);
-          
+
           // Inject Open Graph tags dynamically
           document.title = `${data.title || 'Dars'} - Acadium AI`;
-          
+
           const setMeta = (property, content) => {
             let meta = document.querySelector(`meta[property="${property}"]`);
             if (!meta) {
@@ -35,7 +35,7 @@ export default function PublicLesson() {
             }
             meta.setAttribute('content', content);
           };
-          
+
           setMeta('og:title', data.title || 'Acadium AI Dars');
           setMeta('og:description', `Mavzu: ${data.subject || ''} ${data.grade ? data.grade + '-sinf' : ''}`);
           setMeta('og:site_name', 'Acadium AI');
@@ -48,9 +48,9 @@ export default function PublicLesson() {
         }
       }
     };
-    
+
     fetchPublicLesson();
-    
+
     return () => {
       isMounted = false;
     };
@@ -83,7 +83,7 @@ export default function PublicLesson() {
 
   return (
     <div className="flex flex-col h-[100dvh] w-full bg-slate-50 overflow-hidden font-sans text-slate-900">
-      
+
       {/* Header */}
       <header className="sticky top-0 z-10 flex h-14 flex-shrink-0 items-center border-b border-slate-200 bg-white/80 backdrop-blur-md px-4 shadow-sm">
         <div className="flex items-center gap-2">
@@ -94,22 +94,22 @@ export default function PublicLesson() {
           </div>
           <span className="font-bold text-slate-800 tracking-tight">Acadium AI</span>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        {/* <div className="ml-auto flex items-center gap-2">
           <Link to="/" className="text-xs font-medium text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full hover:bg-indigo-100 transition-colors">
-            O'zingiz yaratish
+            {/* O'zingiz yaratish */}
           </Link>
-        </div>
+        </div> */}
       </header>
 
       {/* Main Content Area */}
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 scroll-smooth">
         <div className="mx-auto max-w-3xl space-y-6 pb-12">
-          
+
           <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm">
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4 leading-tight">
               {lesson.title || "Noma'lum dars"}
             </h1>
-            
+
             {(lesson.subject || lesson.grade || lesson.duration) && (
               <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-100 pb-6">
                 {lesson.subject && <span className="bg-slate-100 text-slate-600 px-2.5 py-1 rounded-md text-xs font-semibold capitalize">{lesson.subject}</span>}
@@ -121,9 +121,9 @@ export default function PublicLesson() {
                 </span>
               </div>
             )}
-            
+
             <div className="prose prose-sm sm:prose-base prose-indigo prose-slate max-w-none">
-              <LessonContent 
+              <LessonContent
                 lessonPlan={lesson.lesson_plan}
                 slides={lesson.slides}
                 assessment={lesson.assessment}
@@ -131,16 +131,16 @@ export default function PublicLesson() {
             </div>
           </div>
 
-          <div className="text-center mt-8">
-            <p className="text-sm text-slate-500 mb-3">Siz ham shunday interaktiv darslar yaratmoqchimisiz?</p>
+          {/* <div className="text-center mt-8">
+            {/* <p className="text-sm text-slate-500 mb-3">Siz ham shunday interaktiv darslar yaratmoqchimisiz?</p> */}
             <Link to="/" className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors font-medium shadow-sm">
                Boshlash
             </Link>
-          </div>
+          </div> */}
 
         </div>
       </main>
-      
+
     </div>
   );
 }
