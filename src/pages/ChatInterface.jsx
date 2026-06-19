@@ -218,7 +218,7 @@ export default function ChatInterface() {
   const handleShare = () => {
     if (!lesson) return;
     
-    const publicUrl = `https://acadium.duckdns.org/lesson/${lesson.id}`;
+    const publicUrl = `${window.location.origin}/public/lesson/${lesson.id}`;
     const text = `📚 ${lesson.title || 'Ochiq dars'}\n\nOpen lesson:\n${publicUrl}`;
     
     const tgUrl = `https://t.me/share/url?url=${encodeURIComponent(publicUrl)}&text=${encodeURIComponent(`📚 ${lesson.title || 'Ochiq dars'}\n\nOpen lesson:`)}`;
