@@ -524,7 +524,8 @@ export default function ChatInterface() {
                 >
                   <svg className="w-5 h-5 translate-x-px" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
                 </button>
-              </form>
+                </form>
+              </div>
             )}
 
             <p className="text-center text-[10px] sm:text-xs text-slate-400 mt-2">
