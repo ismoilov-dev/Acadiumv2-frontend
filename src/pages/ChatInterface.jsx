@@ -6,6 +6,7 @@ import { formatError } from '../utils/formatError';
 import ErrorMessage from '../components/ErrorMessage';
 import LessonContent from '../components/lesson/LessonContent';
 import StatusBadge from '../components/StatusBadge';
+import ProfileDrawer from '../components/ProfileDrawer';
 
 export default function ChatInterface() {
   const { id } = useParams();
@@ -16,6 +17,7 @@ export default function ChatInterface() {
   const [history, setHistory] = useState([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   // Active lesson state
   const [lesson, setLesson] = useState(null);
@@ -186,10 +188,23 @@ export default function ChatInterface() {
         </div>
 
         <div className="p-4 border-t border-slate-200">
-           {/* <button onClick={logout} className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 w-full px-2 py-1.5 rounded-md hover:bg-slate-200 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-              Chiqish
-           </button> */}
+           <button 
+             onClick={() => setIsProfileOpen(true)} 
+             className="flex items-center gap-3 w-full px-2 py-2 rounded-lg hover:bg-slate-200 transition-colors text-left group"
+           >
+              <div className="h-8 w-8 rounded-full overflow-hidden bg-indigo-100 flex items-center justify-center text-sm font-bold text-indigo-600 shrink-0 border border-slate-300 group-hover:border-indigo-400 transition-colors">
+                {user?.avatar_url ? (
+                  <img src={user.avatar_url} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  (user?.full_name || user?.email)?.[0]?.toUpperCase()
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-800 truncate">{user?.full_name}</p>
+                <p className="text-xs text-slate-500 truncate">@{user?.username}</p>
+              </div>
+              <svg className="w-5 h-5 text-slate-400 group-hover:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z" /></svg>
+           </button>
         </div>
       </aside>
 
@@ -337,6 +352,12 @@ export default function ChatInterface() {
         </div>
 
       </main>
+
+      {/* Profile Drawer */}
+      <ProfileDrawer 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)} 
+      />
     </div>
   );
 }
