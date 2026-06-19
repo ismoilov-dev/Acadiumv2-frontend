@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { lessonService } from '../services/lessonService';
 import { useAuth } from '../hooks/useAuth';
 import { formatError } from '../utils/formatError';
+import ErrorMessage from '../components/ErrorMessage';
 import LessonContent from '../components/lesson/LessonContent';
 import StatusBadge from '../components/StatusBadge';
 
@@ -24,6 +25,7 @@ export default function ChatInterface() {
   // New prompt state
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState('');
 
   const bottomRef = useRef(null);
 
@@ -98,14 +100,15 @@ export default function ChatInterface() {
     if (!prompt.trim()) return;
 
     setIsGenerating(true);
+    setGenerateError('');
     try {
-      const data = await lessonService.create({ prompt });
+      const data = await lessonService.generate({ prompt });
       setPrompt('');
       setIsGenerating(false);
       navigate(`/lessons/${data.id}`);
       fetchHistory(); // Optimistic update
     } catch (err) {
-      alert(formatError(err));
+      setGenerateError(formatError(err));
       setIsGenerating(false);
     }
   };
@@ -294,6 +297,11 @@ export default function ChatInterface() {
         {/* Input Area */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-transparent pt-6 pb-4 sm:pb-6 px-4">
           <div className="mx-auto max-w-3xl">
+            {generateError && (
+              <div className="mb-3">
+                <ErrorMessage message={generateError} />
+              </div>
+            )}
             <form onSubmit={handleGenerate} className="relative flex items-end gap-2 bg-white rounded-2xl border border-slate-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500 transition-all p-1.5 sm:p-2">
               <textarea
                 value={prompt}
