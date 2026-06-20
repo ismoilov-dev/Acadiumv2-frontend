@@ -208,6 +208,104 @@ export default function ProfileDrawer({ isOpen, onClose }) {
               </button>
             </div>
           </form>
+
+          {/* Upcoming AI Features */}
+          <div className="mt-8 pt-6 border-t border-slate-200">
+            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2 mb-4">
+              🚀 Upcoming AI Features
+            </h3>
+            
+            <div className="space-y-4">
+              {/* Card 1 */}
+              <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-4 relative shadow-sm pointer-events-none">
+                <div className="absolute top-4 right-4">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase tracking-wider">
+                    Coming Soon
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="text-2xl">🎬</div>
+                  <h4 className="font-bold text-slate-800 pr-20">AI Video Generator</h4>
+                </div>
+                <p className="text-sm text-slate-600 mb-4">Generate educational videos automatically from lessons.</p>
+                <div className="bg-white rounded-xl p-3 border border-slate-100 shadow-sm">
+                  <p className="text-xs font-semibold text-slate-700 mb-2">Features planned:</p>
+                  <ul className="text-xs text-slate-500 space-y-1.5">
+                    <li className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-indigo-400"></div> AI generated narration</li>
+                    <li className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-indigo-400"></div> Animated scenes</li>
+                    <li className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-indigo-400"></div> Educational storytelling</li>
+                    <li className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-indigo-400"></div> Export MP4</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Card 2 */}
+              <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-4 relative shadow-sm pointer-events-none">
+                <div className="absolute top-4 right-4">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase tracking-wider">
+                    Coming Soon
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="text-2xl">🌍</div>
+                  <h4 className="font-bold text-slate-800 pr-20">3D Geography Visualizer</h4>
+                </div>
+                <p className="text-sm text-slate-600 mb-4">Generate interactive geography visualizations.</p>
+                <div className="space-y-3">
+                  <div className="bg-white rounded-xl p-3 border border-slate-100 shadow-sm">
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Examples:</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {['Oceans', 'Seas', 'Mountains', 'Rivers', 'Countries', 'Earth visualization'].map(i => (
+                        <span key={i} className="px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] text-slate-600">{i}</span>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="bg-white rounded-xl p-3 border border-slate-100 shadow-sm">
+                    <p className="text-xs font-semibold text-slate-700 mb-2">Future rendering:</p>
+                    <ul className="text-xs text-slate-500 space-y-1.5">
+                      <li className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-indigo-400"></div> Blender</li>
+                      <li className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-indigo-400"></div> 3ds Max</li>
+                      <li className="flex items-center gap-1.5"><div className="w-1 h-1 rounded-full bg-indigo-400"></div> AI generated 3D scenes</li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100">
+                    <div className="text-xs space-y-2.5">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium text-slate-700">"Pacific Ocean"</span>
+                        <div className="flex items-center gap-2 text-indigo-600">
+                          <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                          <span>AI creates animated ocean visualization</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <span className="font-medium text-slate-700">"Amazon River"</span>
+                        <div className="flex items-center gap-2 text-indigo-600">
+                          <svg className="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                          <span>AI creates 3D river animation</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 3 */}
+              <div className="bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-2xl p-4 relative shadow-sm pointer-events-none">
+                <div className="absolute top-4 right-4">
+                  <span className="inline-flex items-center px-2 py-1 rounded-md text-[10px] font-bold bg-indigo-100 text-indigo-700 uppercase tracking-wider">
+                    Coming Soon
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="text-2xl">🎓</div>
+                  <h4 className="font-bold text-slate-800 pr-20">AI Classroom Assistant</h4>
+                </div>
+                <p className="text-sm text-slate-600">Track student activity and learning progress.</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
