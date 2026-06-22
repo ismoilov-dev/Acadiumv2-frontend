@@ -7,6 +7,7 @@ import ErrorMessage from '../components/ErrorMessage';
 import LessonContent from '../components/lesson/LessonContent';
 import StatusBadge from '../components/StatusBadge';
 import ProfileDrawer from '../components/ProfileDrawer';
+import ComingSoonModal from '../components/ComingSoonModal';
 
 export default function ChatInterface() {
   const { id } = useParams();
@@ -18,6 +19,7 @@ export default function ChatInterface() {
   const [historyLoading, setHistoryLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isComingSoonOpen, setIsComingSoonOpen] = useState(false);
 
   // Active lesson state
   const [lesson, setLesson] = useState(null);
@@ -315,15 +317,26 @@ export default function ChatInterface() {
           </button>
         </div>
 
-        <div className="p-3">
+        <div className="p-3 flex flex-col gap-2">
           <Link
             to="/"
             onClick={() => setIsSidebarOpen(false)}
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
+            className="flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
             Yangi dars yaratish
           </Link>
+          
+          <button
+            onClick={() => setIsComingSoonOpen(true)}
+            className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 px-3 py-2.5 text-sm font-bold text-white shadow-sm hover:from-purple-600 hover:to-indigo-600 transition-all border border-purple-400/30 group relative overflow-hidden"
+          >
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+            <span className="relative z-10 flex items-center gap-2 tracking-wide">
+              <span className="text-base leading-none">✨</span>
+              Coming Soon
+            </span>
+          </button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin scrollbar-thumb-slate-300">
@@ -539,6 +552,12 @@ export default function ChatInterface() {
       <ProfileDrawer 
         isOpen={isProfileOpen} 
         onClose={() => setIsProfileOpen(false)} 
+      />
+
+      {/* Coming Soon Modal */}
+      <ComingSoonModal 
+        isOpen={isComingSoonOpen} 
+        onClose={() => setIsComingSoonOpen(false)} 
       />
 
       {/* Context Menu */}
