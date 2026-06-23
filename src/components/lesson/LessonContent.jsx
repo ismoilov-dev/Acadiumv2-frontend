@@ -33,17 +33,16 @@ export default function LessonContent({
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-3">
           <span className="text-xl">⚠️</span>
         </div>
-        <h3 className="text-sm font-semibold text-red-800 mb-1">
-          Lesson content could not be loaded.
-        </h3>
+        <h3 className="text-sm font-semibold text-red-800 mb-1">Slide generation failed.</h3>
         <p className="text-xs text-red-600 mb-5">
-          The content for this lesson is empty or could not be found.
+          The content for this lesson is incomplete or missing.<br/>
+          Please try regenerating it.
         </p>
-        <button
-          onClick={() => window.location.reload()}
+        <button 
+          onClick={onRetry ? onRetry : () => window.location.reload()}
           className="inline-flex items-center justify-center rounded-lg bg-white border border-red-200 px-5 py-2 text-sm font-medium text-red-700 hover:bg-red-50 shadow-sm transition-colors"
         >
-          Retry
+          Regenerate Lesson
         </button>
       </div>
     );
