@@ -12,7 +12,7 @@ export default function LessonContent({
   errorMessage,
   onRetry,
 }) {
-  const hasContent = lessonPlan || slides || assessment;
+  const hasContent = lessonPlan && slides && assessment;
   const isGenerating =
     ["pending", "processing", "generating"].includes(status) || isRetrying;
 
