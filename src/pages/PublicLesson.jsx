@@ -123,6 +123,7 @@ export default function PublicLesson() {
                 lessonPlan={lesson.lesson_plan}
                 slides={lesson.slides}
                 assessment={lesson.assessment}
+                status={lesson.status || 'completed'}
               />
             </div>
           </div>

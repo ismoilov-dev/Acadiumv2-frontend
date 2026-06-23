@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -17,6 +17,10 @@ export default function LessonDetail() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [actionLoading, setActionLoading] = useState('');
+  
+  const retryCountRef = useRef(0);
+  const MAX_RETRIES = 3;
+
   useEffect(() => {
     let timeoutId;
     let isMounted = true;
@@ -25,11 +29,23 @@ export default function LessonDetail() {
       try {
         const data = await lessonService.get(id);
         if (isMounted) {
+          const isEmptyContent = !data.lesson_plan && !data.slides && !data.assessment;
+          
+          if (data.status === 'completed' && isEmptyContent && retryCountRef.current < MAX_RETRIES) {
+            retryCountRef.current += 1;
+            setLesson(data);
+            setLoading(false);
+            timeoutId = setTimeout(fetchLesson, 2000);
+            return;
+          }
+
           setLesson(data);
           setLoading(false);
 
-          if (data.status === 'processing' || data.status === 'pending') {
+          if (['processing', 'pending', 'generating'].includes(data.status)) {
             timeoutId = setTimeout(fetchLesson, 3000);
+          } else {
+            retryCountRef.current = 0;
           }
         }
       } catch (err) {
@@ -146,6 +162,8 @@ export default function LessonDetail() {
         lessonPlan={lesson.lesson_plan}
         slides={lesson.slides}
         assessment={lesson.assessment}
+        status={lesson.status}
+        isRetrying={retryCountRef.current > 0 && retryCountRef.current < MAX_RETRIES && !lesson.lesson_plan && !lesson.slides && !lesson.assessment}
       />
     </MainLayout>
   );

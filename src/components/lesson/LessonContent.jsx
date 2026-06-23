@@ -2,22 +2,45 @@ import LessonPlanView from './LessonPlanView';
 import SlidesView from './SlidesView';
 import AssessmentView from './AssessmentView';
 
-export default function LessonContent({ lessonPlan, slides, assessment }) {
+export default function LessonContent({ lessonPlan, slides, assessment, status = 'completed', isRetrying = false }) {
   const hasContent = lessonPlan || slides || assessment;
+  const isGenerating = ['pending', 'processing', 'generating'].includes(status) || isRetrying;
+
+  if (isGenerating) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl border border-dashed border-gray-300">
+        <div className="animate-spin w-10 h-10 border-4 border-primary-600 border-t-transparent rounded-full mb-4" />
+        <p className="text-sm font-medium text-gray-700">
+          {isRetrying ? "Ma'lumotlar yuklanmoqda..." : "Dars kontenti yaratilmoqda..."}
+        </p>
+        <p className="text-xs text-gray-500 mt-2">Iltimos, biroz kuting</p>
+      </div>
+    );
+  }
 
   if (!hasContent) {
     return (
-      <div className="rounded-lg border border-dashed border-gray-300 bg-white p-8 text-center text-sm text-gray-500">
-        Dars kontenti hali mavjud emas
+      <div className="flex flex-col items-center justify-center p-10 rounded-xl border border-dashed border-red-200 bg-red-50 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-3">
+          <span className="text-xl">⚠️</span>
+        </div>
+        <h3 className="text-sm font-semibold text-red-800 mb-1">Lesson content could not be loaded.</h3>
+        <p className="text-xs text-red-600 mb-5">The content for this lesson is empty or could not be found.</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="inline-flex items-center justify-center rounded-lg bg-white border border-red-200 px-5 py-2 text-sm font-medium text-red-700 hover:bg-red-50 shadow-sm transition-colors"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      <LessonPlanView plan={lessonPlan} />
-      <SlidesView slidesData={slides} />
-      <AssessmentView assessment={assessment} />
+      {lessonPlan && <LessonPlanView plan={lessonPlan} />}
+      {slides && <SlidesView slidesData={slides} />}
+      {assessment && <AssessmentView assessment={assessment} />}
     </div>
   );
 }
