@@ -8,6 +8,7 @@ export default function LessonContent({
   assessment,
   status = "completed",
   isRetrying = false,
+  onRetry,
 }) {
   const hasContent = lessonPlan || slides || assessment;
   const isGenerating =
@@ -27,7 +28,7 @@ export default function LessonContent({
     );
   }
 
-  if (!hasContent) {
+  if (status === "failed" || !hasContent) {
     return (
       <div className="flex flex-col items-center justify-center p-10 rounded-xl border border-dashed border-red-200 bg-red-50 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-3">
