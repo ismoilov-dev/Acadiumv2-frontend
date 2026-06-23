@@ -32,15 +32,16 @@ export default function LessonContent({
 
   if (status === "failed" || !hasContent) {
     let title = "Generation failed.";
-    if (failedStage === "lesson_plan") title = "Lesson plan generation failed.";
+    if (failedStage === "health_check") title = "AI Provider check failed.";
+    else if (failedStage === "lesson_plan") title = "Lesson plan generation failed.";
     else if (failedStage === "slides") title = "Slides generation failed.";
     else if (failedStage === "assessment") title = "Assessment generation failed.";
 
     let desc = "The content for this lesson is incomplete or missing. Please try regenerating it.";
     if (errorMessage) {
       const lowerError = errorMessage.toLowerCase();
-      if (lowerError.includes("503") || lowerError.includes("provider unavailable") || lowerError.includes("no providers available")) {
-        desc = "AI provider is temporarily unavailable. Please try again later.";
+      if (lowerError.includes("503") || lowerError.includes("provider unavailable") || lowerError.includes("no providers available") || lowerError.includes("502")) {
+        desc = "AI service is temporarily unavailable. Please try again in a few minutes.";
       } else {
         desc = errorMessage;
       }
