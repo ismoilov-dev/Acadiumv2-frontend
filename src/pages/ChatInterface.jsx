@@ -442,9 +442,6 @@ export default function ChatInterface() {
                           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z" /></svg>
                         </div>
                         <div className="flex-1 bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 sm:p-6 shadow-sm overflow-hidden">
-                          {lesson.status === 'failed' ? (
-                            <ErrorMessage message="Generatsiyada xatolik yuz berdi. Qaytadan urinib ko'ring." />
-                          ) : (
                             <div className="w-full max-w-full prose prose-sm prose-indigo prose-slate">
                               {/* Metadata Badges */}
                               {(lesson.subject || lesson.grade) && (
@@ -453,14 +450,27 @@ export default function ChatInterface() {
                                  {lesson.grade && <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold">{lesson.grade}-sinf</span>}
                                  {lesson.duration && <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold">{lesson.duration} daqiqa</span>}
                                </div>
-                            )}
-                            <LessonContent
-                              lessonPlan={lesson.lesson_plan}
-                              slides={lesson.slides}
-                              assessment={lesson.assessment}
-                            />
-                          </div>
-                        )}
+                              )}
+                              <LessonContent
+                                lessonPlan={lesson.lesson_plan}
+                                slides={lesson.slides}
+                                assessment={lesson.assessment}
+                                status={lesson.status}
+                                onRetry={async () => {
+                                  if (!lesson || !lesson.prompt) return;
+                                  try {
+                                    const res = await lessonService.generate({ prompt: lesson.prompt });
+                                    if (res && res.id) {
+                                      navigate(`/lessons/${res.id}`);
+                                    } else {
+                                      window.location.reload();
+                                    }
+                                  } catch(err) {
+                                    alert(formatError(err));
+                                  }
+                                }}
+                              />
+                            </div>
                       </div>
                    </div>
                 </div>
