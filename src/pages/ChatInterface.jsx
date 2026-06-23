@@ -456,6 +456,8 @@ export default function ChatInterface() {
                                 slides={lesson.slides}
                                 assessment={lesson.assessment}
                                 status={lesson.status}
+                                failedStage={lesson.failed_stage}
+                                errorMessage={lesson.error_message}
                                 onRetry={async () => {
                                   if (!lesson || !lesson.prompt) return;
                                   try {

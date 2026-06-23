@@ -8,6 +8,8 @@ export default function LessonContent({
   assessment,
   status = "completed",
   isRetrying = false,
+  failedStage,
+  errorMessage,
   onRetry,
 }) {
   const hasContent = lessonPlan || slides || assessment;
@@ -29,15 +31,29 @@ export default function LessonContent({
   }
 
   if (status === "failed" || !hasContent) {
+    let title = "Generation failed.";
+    if (failedStage === "lesson_plan") title = "Lesson plan generation failed.";
+    else if (failedStage === "slides") title = "Slides generation failed.";
+    else if (failedStage === "assessment") title = "Assessment generation failed.";
+
+    let desc = "The content for this lesson is incomplete or missing. Please try regenerating it.";
+    if (errorMessage) {
+      const lowerError = errorMessage.toLowerCase();
+      if (lowerError.includes("503") || lowerError.includes("provider unavailable") || lowerError.includes("no providers available")) {
+        desc = "AI provider is temporarily unavailable. Please try again later.";
+      } else {
+        desc = errorMessage;
+      }
+    }
+
     return (
       <div className="flex flex-col items-center justify-center p-10 rounded-xl border border-dashed border-red-200 bg-red-50 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-3">
           <span className="text-xl">⚠️</span>
         </div>
-        <h3 className="text-sm font-semibold text-red-800 mb-1">Slide generation failed.</h3>
-        <p className="text-xs text-red-600 mb-5">
-          The content for this lesson is incomplete or missing.<br/>
-          Please try regenerating it.
+        <h3 className="text-sm font-semibold text-red-800 mb-1">{title}</h3>
+        <p className="text-xs text-red-600 mb-5 whitespace-pre-wrap max-w-md">
+          {desc}
         </p>
         <button 
           onClick={onRetry ? onRetry : () => window.location.reload()}
