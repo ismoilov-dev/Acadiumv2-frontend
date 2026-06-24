@@ -16,8 +16,18 @@ export const lessonService = {
     if (resData.lesson_id && resData.id === undefined) {
       resData.id = resData.lesson_id;
     }
+    
+    // Track for platform feedback
+    try {
+      const currentCount = parseInt(localStorage.getItem('acadium_generated_lessons') || '0', 10);
+      localStorage.setItem('acadium_generated_lessons', currentCount + 1);
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+
     return resData;
   },
+
 
   get: async (id) => {
     const response = await apiClient.get(`${LESSONS_BASE}/${id}/`);

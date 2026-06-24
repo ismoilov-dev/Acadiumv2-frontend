@@ -1,4 +1,5 @@
 import Navbar from '../components/Navbar';
+import GlobalPlatformFeedback from '../components/GlobalPlatformFeedback';
 
 export default function MainLayout({ children }) {
   return (
@@ -7,7 +8,9 @@ export default function MainLayout({ children }) {
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-6 lg:px-8 py-5 sm:py-6 md:py-8">
         {children}
       </main>
+      <GlobalPlatformFeedback />
     </div>
   );
 }
+
 

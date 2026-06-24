@@ -49,4 +49,10 @@ export const authService = {
   logout: () => {
     storage.clearAuth();
   },
+
+  submitPlatformFeedback: async (data) => {
+    const response = await apiClient.post(`${AUTH_BASE}/platform-feedback/`, data);
+    return response.data;
+  },
 };
+
