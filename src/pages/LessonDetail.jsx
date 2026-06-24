@@ -5,7 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 import StatusBadge from "../components/StatusBadge";
 import LessonContent from "../components/lesson/LessonContent";
-import FeedbackModal from "../components/lessons/FeedbackModal";
+import LessonFeedbackInline from "../components/lessons/LessonFeedbackInline";
 import { lessonService } from "../services/lessonService";
 import { SUBJECTS, LANGUAGES } from "../utils/constants";
 import { formatError } from "../utils/formatError";
@@ -18,8 +18,6 @@ export default function LessonDetail() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [actionLoading, setActionLoading] = useState("");
-  
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
   const retryCountRef = useRef(0);
@@ -50,12 +48,6 @@ export default function LessonDetail() {
 
           setLesson(data);
           setLoading(false);
-
-          if (data.status === "completed" && !data.has_feedback) {
-            timeoutId = setTimeout(() => {
-              setShowFeedbackModal(true);
-            }, 3000); // Show modal after 3 seconds of viewing
-          }
 
           if (["processing", "pending", "generating"].includes(data.status)) {
             timeoutId = setTimeout(fetchLesson, 3000);
@@ -111,7 +103,6 @@ export default function LessonDetail() {
     try {
       await lessonService.submitFeedback(id, { rating, comment });
       setSuccess("✅ Fikringiz muvaffaqiyatli yuborildi. Rahmat!");
-      setShowFeedbackModal(false);
       setLesson((prev) => ({
         ...prev,
         has_feedback: true,
@@ -244,12 +235,12 @@ export default function LessonDetail() {
         }
       />
       
-      <FeedbackModal 
-        isOpen={showFeedbackModal} 
-        onClose={() => setShowFeedbackModal(false)}
-        onSubmit={handleFeedbackSubmit}
-        isSubmitting={submittingFeedback}
-      />
+      {lesson.status === "completed" && !lesson.has_feedback && (
+        <LessonFeedbackInline 
+          onSubmit={handleFeedbackSubmit}
+          isSubmitting={submittingFeedback}
+        />
+      )}
     </MainLayout>
   );
 }
