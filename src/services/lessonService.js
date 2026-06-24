@@ -56,4 +56,9 @@ export const lessonService = {
     const response = await apiClient.post(`${LESSONS_BASE}/${id}/send_telegram/`);
     return response.data;
   },
+
+  submitFeedback: async (id, data) => {
+    const response = await apiClient.post(`${LESSONS_BASE}/${id}/feedback/`, data);
+    return response.data;
+  },
 };

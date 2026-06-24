@@ -5,6 +5,7 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 import StatusBadge from "../components/StatusBadge";
 import LessonContent from "../components/lesson/LessonContent";
+import FeedbackModal from "../components/lessons/FeedbackModal";
 import { lessonService } from "../services/lessonService";
 import { SUBJECTS, LANGUAGES } from "../utils/constants";
 import { formatError } from "../utils/formatError";
@@ -17,6 +18,9 @@ export default function LessonDetail() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [actionLoading, setActionLoading] = useState("");
+  
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
   const retryCountRef = useRef(0);
   const MAX_RETRIES = 3;
@@ -46,6 +50,12 @@ export default function LessonDetail() {
 
           setLesson(data);
           setLoading(false);
+
+          if (data.status === "completed" && !data.has_feedback) {
+            timeoutId = setTimeout(() => {
+              setShowFeedbackModal(true);
+            }, 3000); // Show modal after 3 seconds of viewing
+          }
 
           if (["processing", "pending", "generating"].includes(data.status)) {
             timeoutId = setTimeout(fetchLesson, 3000);
@@ -93,6 +103,25 @@ export default function LessonDetail() {
       setError(formatError(err));
     } finally {
       setActionLoading("");
+    }
+  };
+
+  const handleFeedbackSubmit = async ({ rating, comment }) => {
+    setSubmittingFeedback(true);
+    try {
+      await lessonService.submitFeedback(id, { rating, comment });
+      setSuccess("✅ Fikringiz muvaffaqiyatli yuborildi. Rahmat!");
+      setShowFeedbackModal(false);
+      setLesson((prev) => ({
+        ...prev,
+        has_feedback: true,
+        total_feedback: prev.total_feedback + 1,
+        // Calculate new average rating approximately or just re-fetch
+      }));
+    } catch (err) {
+      setError(formatError(err));
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -150,6 +179,16 @@ export default function LessonDetail() {
             <p className="mt-1 text-2xs sm:text-xs text-gray-400">
               {new Date(lesson.created_at).toLocaleString("uz-UZ")}
             </p>
+            
+            {lesson.total_feedback > 0 && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-gray-600">
+                <span className="flex items-center text-yellow-500 font-semibold">
+                  ⭐ {lesson.average_rating} / 5
+                </span>
+                <span>·</span>
+                <span>{lesson.total_feedback} ta fikr</span>
+              </div>
+            )}
           </div>
           <div className="shrink-0">
             <StatusBadge status={lesson.status} />
@@ -203,6 +242,13 @@ export default function LessonDetail() {
           !lesson.slides &&
           !lesson.assessment
         }
+      />
+      
+      <FeedbackModal 
+        isOpen={showFeedbackModal} 
+        onClose={() => setShowFeedbackModal(false)}
+        onSubmit={handleFeedbackSubmit}
+        isSubmitting={submittingFeedback}
       />
     </MainLayout>
   );
