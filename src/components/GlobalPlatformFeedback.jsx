@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Star } from "lucide-react";
+import { Star, MessageCircle } from "lucide-react";
 import { authService } from "../services/authService";
 
 export default function GlobalPlatformFeedback() {
@@ -13,10 +13,6 @@ export default function GlobalPlatformFeedback() {
   useEffect(() => {
     // Determine if we should show the modal
     const checkTriggers = () => {
-      // TEMPORARY FOR TESTING: bypass all checks
-      setIsOpen(true);
-      return true;
-      
       const submittedAt = localStorage.getItem("acadium_platform_feedback_submitted_at");
       if (submittedAt) {
         const submittedDate = new Date(submittedAt);
@@ -90,7 +86,17 @@ export default function GlobalPlatformFeedback() {
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-6 right-6 z-[90] flex items-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
+      >
+        <MessageCircle className="w-5 h-5" />
+        Fikr bildirish
+      </button>
+    );
+  }
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
