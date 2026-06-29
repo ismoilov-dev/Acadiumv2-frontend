@@ -8,6 +8,7 @@ import LessonContent from '../components/lesson/LessonContent';
 import StatusBadge from '../components/StatusBadge';
 import ProfileDrawer from '../components/ProfileDrawer';
 import ComingSoonModal from '../components/ComingSoonModal';
+import GlobalPlatformFeedback from '../components/GlobalPlatformFeedback';
 
 export default function ChatInterface() {
   const { id } = useParams();
@@ -571,6 +572,9 @@ export default function ChatInterface() {
         isOpen={isComingSoonOpen} 
         onClose={() => setIsComingSoonOpen(false)} 
       />
+
+      {/* Platform Feedback */}
+      <GlobalPlatformFeedback />
 
       {/* Context Menu */}
       {contextMenu.visible && (
