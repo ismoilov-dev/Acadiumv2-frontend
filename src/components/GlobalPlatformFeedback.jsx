@@ -41,11 +41,9 @@ export default function GlobalPlatformFeedback() {
       // Trigger conditions:
       // 1. Generated 3 or more lessons
       // 2. Spent 5+ mins in current session
-      if (generatedLessons >= 3 || minsInSession >= 5) {
-        setIsOpen(true);
-        return true;
-      }
-      return false;
+      // TEMPORARY: show immediately for testing
+      setIsOpen(true);
+      return true;
     };
 
     // Check immediately
