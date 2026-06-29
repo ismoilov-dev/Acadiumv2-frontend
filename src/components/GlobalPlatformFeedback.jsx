@@ -13,6 +13,10 @@ export default function GlobalPlatformFeedback() {
   useEffect(() => {
     // Determine if we should show the modal
     const checkTriggers = () => {
+      // TEMPORARY FOR TESTING: bypass all checks
+      setIsOpen(true);
+      return true;
+      
       const submittedAt = localStorage.getItem("acadium_platform_feedback_submitted_at");
       if (submittedAt) {
         const submittedDate = new Date(submittedAt);
