@@ -1,5 +1,5 @@
-import Navbar from '../components/Navbar';
-import GlobalPlatformFeedback from '../components/GlobalPlatformFeedback';
+import Navbar from "../components/Navbar";
+import GlobalPlatformFeedback from "../components/GlobalPlatformFeedback";
 
 export default function MainLayout({ children }) {
   return (
@@ -12,5 +12,3 @@ export default function MainLayout({ children }) {
     </div>
   );
 }
-
-

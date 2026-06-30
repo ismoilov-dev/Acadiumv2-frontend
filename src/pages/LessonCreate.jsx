@@ -1,152 +1,112 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import MainLayout from '../layouts/MainLayout';
-import ErrorMessage from '../components/ErrorMessage';
-import { lessonService } from '../services/lessonService';
-import { SUBJECTS, LANGUAGES, DURATIONS, GRADES } from '../utils/constants';
-import { formatError } from '../utils/formatError';
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import MainLayout from "../layouts/MainLayout";
+import ErrorMessage from "../components/ErrorMessage";
+import { lessonService } from "../services/lessonService";
+import { formatError } from "../utils/formatError";
 
 export default function LessonCreate() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({
-    subject: 'math',
-    grade: 5,
-    duration: 45,
-    language: 'uz',
-    prompt: '',
-  });
+  const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: name === 'grade' || name === 'duration' ? Number(value) : value,
-    }));
-  };
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    if (!prompt.trim()) return;
+    setError("");
     setLoading(true);
     try {
-      const lesson = await lessonService.generate(form);
+      const lesson = await lessonService.generate({ prompt });
       navigate(`/lessons/${lesson.id}`);
     } catch (err) {
       setError(formatError(err));
-    } finally {
       setLoading(false);
     }
   };
 
   return (
     <MainLayout>
-      <h1 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-bold text-gray-900">Yangi dars yaratish</h1>
-
-      <div className="mx-auto max-w-2xl rounded-xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
-        <p className="mb-5 sm:mb-6 text-xs sm:text-sm text-gray-600">
-          Dars mavzusini yozing — AI sizga dars rejasi, slaydlar va baholash materiallarini yaratadi.
-        </p>
-
-
-        {error && <div className="mb-4"><ErrorMessage message={error} /></div>}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="prompt" className="block text-sm font-medium text-gray-700">
-              Dars mavzusi / so'rovingiz
-            </label>
-            <textarea
-              id="prompt"
-              name="prompt"
-              required
-              rows={4}
-              value={form.prompt}
-              onChange={handleChange}
-              placeholder="Masalan: 5-sinf uchun kasrlar qo'shish va ayirish"
-              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-            />
+      <div className="flex flex-col items-center justify-center min-h-[75vh] px-2 sm:px-4 w-full">
+        <div className="w-full max-w-3xl mx-auto flex flex-col items-center">
+          
+          {/* Header Section */}
+          <div className="text-center mb-8 sm:mb-12 w-full">
+            <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-indigo-50 text-indigo-600 mb-6 shadow-sm border border-indigo-100">
+              <svg className="w-8 h-8 sm:w-10 sm:h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight mb-4">
+              Yangi dars yaratish
+            </h1>
+            <p className="text-base sm:text-lg text-slate-500 max-w-xl mx-auto leading-relaxed">
+              Dars mavzusini erkin yozing. AI avtomatik ravishda dars rejasi, slaydlar va baholashni tayyorlaydi.
+            </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
-                Fan
-              </label>
-              <select
-                id="subject"
-                name="subject"
-                value={form.subject}
-                onChange={handleChange}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              >
-                {SUBJECTS.map(({ value, label }) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="grade" className="block text-sm font-medium text-gray-700">
-                Sinf
-              </label>
-              <select
-                id="grade"
-                name="grade"
-                value={form.grade}
-                onChange={handleChange}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              >
-                {GRADES.map((g) => (
-                  <option key={g} value={g}>{g}-sinf</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="duration" className="block text-sm font-medium text-gray-700">
-                Davomiylik (daqiqa)
-              </label>
-              <select
-                id="duration"
-                name="duration"
-                value={form.duration}
-                onChange={handleChange}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              >
-                {DURATIONS.map((d) => (
-                  <option key={d} value={d}>{d} daqiqa</option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label htmlFor="language" className="block text-sm font-medium text-gray-700">
-                Til
-              </label>
-              <select
-                id="language"
-                name="language"
-                value={form.language}
-                onChange={handleChange}
-                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              >
-                {LANGUAGES.map(({ value, label }) => (
-                  <option key={value} value={value}>{label}</option>
-                ))}
-              </select>
+          {/* Form Section */}
+          <div className="w-full relative">
+            {error && (
+              <div className="mb-6 w-full">
+                <ErrorMessage message={error} />
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit} className="w-full relative group z-10">
+              <div className={`absolute -inset-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-500 ${loading ? 'opacity-40 animate-pulse' : ''}`}></div>
+              
+              <div className="relative flex flex-col sm:flex-row bg-white rounded-[2rem] shadow-xl overflow-hidden border border-slate-100 p-2 sm:p-2.5">
+                <input
+                  type="text"
+                  required
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  disabled={loading}
+                  placeholder="Masalan: Python CRUD"
+                  className="w-full flex-1 appearance-none bg-transparent py-4 px-6 text-lg sm:text-xl text-slate-900 placeholder:text-slate-400 focus:outline-none disabled:opacity-50"
+                  autoFocus
+                />
+                
+                <button
+                  type="submit"
+                  disabled={loading || !prompt.trim()}
+                  className="mt-2 sm:mt-0 flex shrink-0 items-center justify-center gap-2 rounded-2xl bg-indigo-600 px-8 py-4 sm:py-5 text-base sm:text-lg font-bold text-white shadow-md hover:bg-indigo-700 hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 active:scale-95 whitespace-nowrap"
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Yaratilmoqda...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Dars Yaratish
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+            
+            {/* Quick Suggestions */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+              <span className="text-sm font-medium text-slate-400 w-full text-center sm:w-auto sm:text-left mb-2 sm:mb-0">Tezkor misollar:</span>
+              {['9-sinf Fizika yorug\'lik', 'Ingliz tili Present Simple', 'Tarix Temuriylar davri'].map(hint => (
+                <button
+                  key={hint}
+                  type="button"
+                  onClick={() => setPrompt(hint)}
+                  disabled={loading}
+                  className="px-4 py-2 rounded-full bg-slate-100 text-slate-600 text-xs sm:text-sm font-medium hover:bg-slate-200 hover:text-slate-900 transition-colors disabled:opacity-50"
+                >
+                  {hint}
+                </button>
+              ))}
             </div>
           </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-primary-600 py-3 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
-          >
-            {loading ? 'AI dars yaratmoqda... (bu biroz vaqt olishi mumkin)' : 'Dars yaratish'}
-          </button>
-        </form>
+        </div>
       </div>
     </MainLayout>
   );
