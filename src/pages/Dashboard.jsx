@@ -109,7 +109,6 @@ export default function Dashboard() {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Sarlavha</th>
-                      <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Sinf</th>
                       <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Holat</th>
                       <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Sana</th>
                     </tr>
@@ -122,7 +121,6 @@ export default function Dashboard() {
                             {lesson.title}
                           </Link>
                         </td>
-                        <td className="px-5 py-3.5 text-sm text-gray-600">{lesson.grade}-sinf</td>
                         <td className="px-5 py-3.5">
                           <StatusBadge status={lesson.status} />
                         </td>
@@ -148,8 +146,6 @@ export default function Dashboard() {
                           {lesson.title}
                         </Link>
                         <div className="mt-1.5 flex flex-wrap items-center gap-x-2 text-xs text-gray-500 font-medium">
-                          <span>{lesson.grade}-sinf</span>
-                          <span>•</span>
                           <span>{new Date(lesson.created_at).toLocaleDateString('uz-UZ')}</span>
                         </div>
                       </div>

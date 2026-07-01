@@ -16,9 +16,6 @@ export default function LessonCreatePage() {
 
   const handleSubmit = (formData) => {
     generateLesson({
-      subject : formData.subject,
-      grade   : formData.grade,
-      duration: formData.duration,
       language: formData.language,
       prompt  : formData.prompt,
     });

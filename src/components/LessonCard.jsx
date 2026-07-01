@@ -3,8 +3,6 @@ import StatusBadge from './StatusBadge';
 import { SUBJECTS } from '../utils/constants';
 
 export default function LessonCard({ lesson, onDelete }) {
-  const subjectLabel = SUBJECTS.find((s) => s.value === lesson.subject)?.label || lesson.subject;
-
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 sm:p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between gap-3">
@@ -15,9 +13,7 @@ export default function LessonCard({ lesson, onDelete }) {
           >
             {lesson.title}
           </Link>
-          <p className="mt-1 text-xs sm:text-sm text-gray-500 font-medium">
-            {subjectLabel} · {lesson.grade}-sinf · {lesson.duration} daqiqa
-          </p>
+
           <p className="mt-1 text-2xs sm:text-xs text-gray-400">
             {new Date(lesson.created_at).toLocaleDateString('uz-UZ')}
           </p>

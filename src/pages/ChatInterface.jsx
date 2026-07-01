@@ -600,26 +600,7 @@ export default function ChatInterface() {
                       </div>
                       <div className="flex-1 bg-white border border-slate-200 rounded-2xl rounded-tl-sm p-4 sm:p-6 shadow-sm overflow-hidden">
                         <div className="w-full max-w-full prose prose-sm prose-indigo prose-slate">
-                          {/* Metadata Badges */}
-                          {(lesson.subject || lesson.grade) && (
-                            <div className="flex flex-wrap gap-2 mb-6">
-                              {lesson.subject && (
-                                <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold capitalize">
-                                  {lesson.subject}
-                                </span>
-                              )}
-                              {lesson.grade && (
-                                <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold">
-                                  {lesson.grade}-sinf
-                                </span>
-                              )}
-                              {lesson.duration && (
-                                <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded text-xs font-semibold">
-                                  {lesson.duration} daqiqa
-                                </span>
-                              )}
-                            </div>
-                          )}
+                          {/* Metadata Badges Removed */}
                           <LessonContent
                             lessonPlan={lesson.lesson_plan}
                             slides={lesson.slides}

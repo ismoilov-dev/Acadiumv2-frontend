@@ -130,7 +130,6 @@ export default function LessonDetail() {
     );
   if (!lesson) return null;
 
-  const subjectLabel = SUBJECTS.find((s) => s.value === lesson.subject)?.label;
   const languageLabel = LANGUAGES.find(
     (l) => l.value === lesson.language,
   )?.label;
@@ -164,7 +163,6 @@ export default function LessonDetail() {
               {lesson.title}
             </h1>
             <p className="mt-1.5 text-xs sm:text-sm text-gray-600 font-medium">
-              {subjectLabel} · {lesson.grade}-sinf · {lesson.duration} daqiqa ·{" "}
               {languageLabel}
             </p>
             <p className="mt-1 text-2xs sm:text-xs text-gray-400">
