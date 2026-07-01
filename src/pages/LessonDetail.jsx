@@ -233,6 +233,14 @@ export default function LessonDetail() {
           !lesson.slides &&
           !lesson.assessment
         }
+        onRetry={async () => {
+          try {
+            await lessonService.regenerate(lesson.id);
+            window.location.reload();
+          } catch (err) {
+            alert(err);
+          }
+        }}
       />
       
       {lesson.status === "completed" && !lesson.has_feedback && (
