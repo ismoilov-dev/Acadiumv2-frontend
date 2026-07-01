@@ -30,6 +30,7 @@ export default function ChatInterface() {
   // New prompt state
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [progress, setProgress] = useState(0);
 
@@ -110,9 +111,10 @@ export default function ChatInterface() {
         setLesson(data);
         setLessonLoading(false);
 
-        // Make sure isGenerating is forcefully reset if the lesson is completed or failed
+        // Make sure isGenerating/isRegenerating is forcefully reset if the lesson is completed or failed
         if (data.status === "completed" || data.status === "failed") {
           setIsGenerating(false);
+          setIsRegenerating(false);
         }
 
         if (data.status === "processing" || data.status === "pending") {
@@ -138,6 +140,7 @@ export default function ChatInterface() {
           setLessonError(formatError(err));
           setLessonLoading(false);
           setIsGenerating(false);
+          setIsRegenerating(false);
           localStorage.removeItem("acadium_generation");
         }
       }
@@ -156,6 +159,7 @@ export default function ChatInterface() {
     let interval;
     const isActive =
       isGenerating ||
+      isRegenerating ||
       lesson?.status === "processing" ||
       lesson?.status === "pending";
 
@@ -193,7 +197,7 @@ export default function ChatInterface() {
       setProgress(0);
     }
     return () => clearInterval(interval);
-  }, [isGenerating, lesson?.status]);
+  }, [isGenerating, isRegenerating, lesson?.status]);
 
   // Scroll to bottom when lesson updates
   useEffect(() => {
@@ -624,17 +628,27 @@ export default function ChatInterface() {
                             failedStage={lesson.failed_stage}
                             errorMessage={lesson.error_message}
                             onRetry={async () => {
-                              if (!lesson || !lesson.prompt) return;
+                              if (!lesson) return;
                               try {
-                                const res = await lessonService.generate({
-                                  topic: lesson.prompt,
-                                });
+                                setIsRegenerating(true);
+                                setProgress(0);
+                                const res = await lessonService.regenerate(lesson.id);
                                 if (res && res.id) {
-                                  navigate(`/lessons/${res.id}`);
+                                  localStorage.setItem(
+                                    "acadium_generation",
+                                    JSON.stringify({
+                                      lesson_id: res.id,
+                                      generation_status: "processing",
+                                      progress: 0,
+                                      current_step: "Analyzing prompt"
+                                    }),
+                                  );
+                                  // Polling in useEffect will pick this up automatically
                                 } else {
                                   window.location.reload();
                                 }
                               } catch (err) {
+                                setIsRegenerating(false);
                                 alert(formatError(err));
                               }
                             }}
@@ -660,13 +674,14 @@ export default function ChatInterface() {
             )}
 
             {isGenerating ||
+            isRegenerating ||
             lesson?.status === "processing" ||
             lesson?.status === "pending" ? (
               <div className="bg-white rounded-2xl border border-indigo-100 shadow-sm p-4 sm:p-5 flex flex-col items-center justify-center space-y-3">
                 <div className="flex items-center gap-3">
                   <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
                   <span className="font-semibold text-indigo-700">
-                    Generating lesson...
+                    {isRegenerating || (lesson?.status === 'processing' && !isGenerating) ? "Regenerating lesson..." : "Generating lesson..."}
                   </span>
                 </div>
                 <p className="text-xs sm:text-sm text-slate-500">
@@ -750,13 +765,13 @@ export default function ChatInterface() {
                     placeholder="Yangi dars yaratish uchun prompt yozing..."
                     className="w-full resize-none bg-transparent border-0 py-2.5 px-3 text-sm text-slate-900 focus:ring-0 max-h-32 scrollbar-thin outline-none disabled:text-slate-400 disabled:cursor-not-allowed"
                     rows="1"
-                    disabled={isGenerating}
+                    disabled={isGenerating || isRegenerating}
                     style={{ minHeight: "44px" }}
                   />
 
                   <button
                     type="submit"
-                    disabled={!prompt.trim() || isGenerating}
+                    disabled={!prompt.trim() || isGenerating || isRegenerating}
                     className="flex shrink-0 items-center justify-center h-10 w-10 sm:h-11 sm:w-11 rounded-xl bg-indigo-600 text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50 disabled:bg-slate-300 transition-colors"
                   >
                     <svg

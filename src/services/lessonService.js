@@ -29,6 +29,15 @@ export const lessonService = {
   },
 
 
+  regenerate: async (id) => {
+    const response = await apiClient.post(`${LESSONS_BASE}/${id}/regenerate/`);
+    const resData = response.data || {};
+    if (resData.lesson_id && resData.id === undefined) {
+      resData.id = resData.lesson_id;
+    }
+    return resData;
+  },
+
   get: async (id) => {
     const response = await apiClient.get(`${LESSONS_BASE}/${id}/`);
     return response.data;
