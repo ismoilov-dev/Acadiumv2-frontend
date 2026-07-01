@@ -210,7 +210,7 @@ export default function ChatInterface() {
     setGenerateError("");
     setProgress(0);
     try {
-      const data = await lessonService.generate({ prompt });
+      const data = await lessonService.generate({ topic: prompt });
       setPrompt("");
 
       // Store initial generation state
@@ -627,7 +627,7 @@ export default function ChatInterface() {
                               if (!lesson || !lesson.prompt) return;
                               try {
                                 const res = await lessonService.generate({
-                                  prompt: lesson.prompt,
+                                  topic: lesson.prompt,
                                 });
                                 if (res && res.id) {
                                   navigate(`/lessons/${res.id}`);
