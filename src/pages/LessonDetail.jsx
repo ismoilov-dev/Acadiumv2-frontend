@@ -91,6 +91,11 @@ export default function LessonDetail() {
       await lessonService.sendToTelegram(id);
       // Show success message
       setSuccess("✅ PPTX fayl Telegram chatga yuborildi.");
+      
+      // Request platform feedback naturally after success
+      setTimeout(() => {
+        window.dispatchEvent(new Event("trigger_platform_feedback"));
+      }, 1500);
     } catch (err) {
       setError(formatError(err));
     } finally {

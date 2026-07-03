@@ -21,52 +21,26 @@ export default function GlobalPlatformFeedback() {
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
-    // Determine if we should show the modal
-    const checkTriggers = () => {
+    const handleTriggerEvent = () => {
       const submittedAt = localStorage.getItem("acadium_platform_feedback_submitted_at");
       if (submittedAt) {
         const submittedDate = new Date(submittedAt);
         const daysSinceSubmit = (Date.now() - submittedDate.getTime()) / (1000 * 60 * 60 * 24);
-        // Wait 30 days before asking again if they already submitted
-        if (daysSinceSubmit < 30) return false;
+        if (daysSinceSubmit < 30) return;
       }
 
       const dismissedAt = localStorage.getItem("acadium_platform_feedback_dismissed_at");
       if (dismissedAt) {
         const dismissedDate = new Date(dismissedAt);
         const daysSinceDismiss = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
-        // Wait 7 days before asking again if they dismissed
-        if (daysSinceDismiss < 7) return false;
+        if (daysSinceDismiss < 7) return;
       }
 
-      const generatedLessons = parseInt(localStorage.getItem("acadium_generated_lessons") || "0", 10);
-      
-      const sessionStartStr = localStorage.getItem("acadium_session_start");
-      let sessionStart = sessionStartStr ? new Date(sessionStartStr) : new Date();
-      if (!sessionStartStr) {
-        localStorage.setItem("acadium_session_start", sessionStart.toISOString());
-      }
-      const minsInSession = (Date.now() - sessionStart.getTime()) / (1000 * 60);
-
-      // Trigger conditions:
-      // 1. Generated 3 or more lessons
-      // 2. Spent 5+ mins in current session
-      // TEMPORARY: show immediately for testing
       setIsOpen(true);
-      return true;
     };
 
-    // Check immediately
-    if (checkTriggers()) return;
-
-    // And then check periodically every minute
-    const interval = setInterval(() => {
-      if (checkTriggers()) {
-        clearInterval(interval);
-      }
-    }, 60000);
-
-    return () => clearInterval(interval);
+    window.addEventListener("trigger_platform_feedback", handleTriggerEvent);
+    return () => window.removeEventListener("trigger_platform_feedback", handleTriggerEvent);
   }, []);
 
   const handleDismiss = () => {
@@ -109,9 +83,14 @@ export default function GlobalPlatformFeedback() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-300">
-        
+    <div className="fixed bottom-4 right-4 z-[100] w-full max-w-[320px] rounded-2xl bg-white p-5 shadow-2xl border border-gray-100 animate-in slide-in-from-bottom-10 fade-in duration-300">
+      <button 
+        onClick={handleDismiss}
+        className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+        aria-label="Yopish"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
         {isSuccess ? (
           <div className="text-center py-6">
             <div className="text-4xl mb-4">❤️</div>
@@ -186,7 +165,6 @@ export default function GlobalPlatformFeedback() {
             </form>
           </>
         )}
-      </div>
     </div>
   );
 }
