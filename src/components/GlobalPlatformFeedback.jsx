@@ -74,7 +74,7 @@ export default function GlobalPlatformFeedback() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-[90] flex items-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
+        className="fixed bottom-24 right-4 sm:right-6 z-[90] flex items-center gap-2 rounded-full bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-lg hover:bg-primary-700 transition-all hover:scale-105 active:scale-95"
       >
         <MessageCircle className="w-5 h-5" />
         Fikr bildirish
@@ -83,7 +83,7 @@ export default function GlobalPlatformFeedback() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-[100] w-full max-w-[320px] rounded-2xl bg-white p-5 shadow-2xl border border-gray-100 animate-in slide-in-from-bottom-10 fade-in duration-300">
+    <div className="fixed bottom-24 right-4 sm:right-6 z-[100] w-full max-w-[320px] rounded-2xl bg-white p-5 shadow-2xl border border-gray-100 animate-in slide-in-from-bottom-10 fade-in duration-300">
       <button 
         onClick={handleDismiss}
         className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
