@@ -74,22 +74,42 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
             <h2 className="text-2xl font-extrabold text-slate-900 mb-4 tracking-tight">
               To'lov tekshirilmoqda
             </h2>
-            <p className="text-slate-500 mb-8 font-medium px-4 leading-relaxed text-sm">
-              Sizning to'lovingiz admin tomonidan tasdiqlanishi kutilmoqda. Tez orada premium faollashadi.
+            <p className="text-slate-500 mb-6 font-medium px-4 leading-relaxed text-sm">
+              Sizning to'lovingiz admin tomonidan tasdiqlanishi kutilmoqda. Agar hali to'lovni amalga oshirmagan bo'lsangiz, quyidagi tugma orqali to'lov qiling.
             </p>
-            <button
-              onClick={() => {
-                const url = 'https://t.me/ismoilovf_oo5';
-                if (window.Telegram?.WebApp?.openTelegramLink) {
-                  window.Telegram.WebApp.openTelegramLink(url);
-                } else {
-                  window.open(url, '_blank');
-                }
-              }}
-              className="px-8 py-3.5 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-colors font-bold text-sm shadow-sm"
-            >
-              Telegram orqali bog'lanish
-            </button>
+
+            <div className="space-y-3 px-2">
+              <button
+                onClick={() => {
+                  const url = "https://my.click.uz/auth?request=8B9793CF7A773C3F2295134981584A4589CB99419171778CCA59323E85CB6AEC";
+                  if (window.Telegram?.WebApp?.openLink) {
+                    window.Telegram.WebApp.openLink(url);
+                  } else {
+                    window.open(url, '_blank');
+                  }
+                }}
+                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] transition-all py-3.5 font-bold text-[15px] shadow-lg"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Click orqali to'lov qilish
+              </button>
+
+              <button
+                onClick={() => {
+                  const url = 'https://t.me/ismoilovf_oo5';
+                  if (window.Telegram?.WebApp?.openTelegramLink) {
+                    window.Telegram.WebApp.openTelegramLink(url);
+                  } else {
+                    window.open(url, '_blank');
+                  }
+                }}
+                className="w-full px-8 py-3.5 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-colors font-bold text-sm shadow-sm"
+              >
+                Adminga skrinshot yuborish
+              </button>
+            </div>
           </div>
         ) : (
           <div className="w-full relative z-10">
