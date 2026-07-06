@@ -9,11 +9,12 @@ import StatusBadge from "../components/StatusBadge";
 import ProfileDrawer from "../components/ProfileDrawer";
 import ComingSoonModal from "../components/ComingSoonModal";
 import GlobalPlatformFeedback from "../components/GlobalPlatformFeedback";
+import PremiumModal from "../components/PremiumModal";
 
 export default function ChatInterface() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
 
   // Sidebar state
   const [history, setHistory] = useState([]);
@@ -33,6 +34,7 @@ export default function ChatInterface() {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [progress, setProgress] = useState(0);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
 
   // Context Menu and Modals state
   const [contextMenu, setContextMenu] = useState({
@@ -210,6 +212,11 @@ export default function ChatInterface() {
     e.preventDefault();
     if (!prompt.trim() || isGenerating) return;
 
+    if (user && !user.is_premium && user.free_generations <= 0) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     setIsGenerating(true);
     setGenerateError("");
     setProgress(0);
@@ -233,7 +240,12 @@ export default function ChatInterface() {
       // We deliberately keep isGenerating true here to prevent flickering.
       // It will be reset to false when fetchLesson completes.
     } catch (err) {
-      setGenerateError(formatError(err));
+      if (err?.response?.data?.code === 'premium_required' || err?.response?.status === 402) {
+        setShowPremiumModal(true);
+        if (user && !user.is_premium) await refreshUser();
+      } else {
+        setGenerateError(formatError(err));
+      }
       setIsGenerating(false);
       localStorage.removeItem("acadium_generation");
     }
@@ -923,6 +935,13 @@ export default function ChatInterface() {
           </form>
         </div>
       )}
+      {/* Premium Modal */}
+      <PremiumModal 
+        isOpen={showPremiumModal} 
+        onClose={() => setShowPremiumModal(false)} 
+        user={user}
+        onStatusChange={refreshUser}
+      />
     </div>
   );
 }
