@@ -9,9 +9,17 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
 
   const isPending = user.has_pending_subscription;
 
-  const handleSendScreenshot = async () => {
+    const openAdminChat = () => {
+      const url = 'https://t.me/ismoilovf_oo5';
+      if (window.Telegram?.WebApp?.openTelegramLink) {
+        window.Telegram.WebApp.openTelegramLink(url);
+      } else {
+        window.open(url, '_blank');
+      }
+    };
+
     if (isPending) {
-      window.open('https://t.me/ismoilovf_oo5', '_blank');
+      openAdminChat();
       return;
     }
     
@@ -22,7 +30,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
       await authService.requestPremium();
       // Update local status so UI reflects pending state
       if (onStatusChange) onStatusChange();
-      window.open('https://t.me/ismoilovf_oo5', '_blank');
+      openAdminChat();
     } catch (err) {
       setError(err.response?.data?.detail || 'Xatolik yuz berdi');
     } finally {
@@ -69,7 +77,14 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
               Sizning to'lovingiz admin tomonidan tasdiqlanishi kutilmoqda. Tez orada premium faollashadi.
             </p>
             <button
-              onClick={() => window.open('https://t.me/ismoilovf_oo5', '_blank')}
+              onClick={() => {
+                const url = 'https://t.me/ismoilovf_oo5';
+                if (window.Telegram?.WebApp?.openTelegramLink) {
+                  window.Telegram.WebApp.openTelegramLink(url);
+                } else {
+                  window.open(url, '_blank');
+                }
+              }}
               className="px-8 py-3.5 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-colors font-bold text-sm shadow-sm"
             >
               Telegram orqali bog'lanish
@@ -102,17 +117,22 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
                   50 000 <span className="text-xl font-medium opacity-90">UZS</span>
                 </div>
                 
-                <a
-                  href="https://my.click.uz/auth?request=8B9793CF7A773C3F2295134981584A4589CB99419171778CCA59323E85CB6AEC"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => {
+                    const url = "https://my.click.uz/auth?request=8B9793CF7A773C3F2295134981584A4589CB99419171778CCA59323E85CB6AEC";
+                    if (window.Telegram?.WebApp?.openLink) {
+                      window.Telegram.WebApp.openLink(url);
+                    } else {
+                      window.open(url, '_blank');
+                    }
+                  }}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white text-blue-600 hover:bg-slate-50 active:scale-[0.98] transition-all py-3.5 font-bold text-[15px] shadow-lg"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   Click orqali to'lov qilish
-                </a>
+                </button>
               </div>
             </div>
 
