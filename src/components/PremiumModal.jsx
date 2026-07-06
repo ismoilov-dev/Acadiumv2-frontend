@@ -9,6 +9,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
 
   const isPending = user.has_pending_subscription;
 
+  const handleSendScreenshot = async () => {
     const openAdminChat = () => {
       const url = 'https://t.me/ismoilovf_oo5';
       if (window.Telegram?.WebApp?.openTelegramLink) {
