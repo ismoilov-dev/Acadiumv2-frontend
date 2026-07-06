@@ -11,7 +11,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
 
   const handleSendScreenshot = async () => {
     if (isPending) {
-      window.open('https://t.me/placeholder_username', '_blank');
+      window.open('https://t.me/ismoilovf_oo5', '_blank');
       return;
     }
     
@@ -22,7 +22,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
       await authService.requestPremium();
       // Update local status so UI reflects pending state
       if (onStatusChange) onStatusChange();
-      window.open('https://t.me/placeholder_username', '_blank');
+      window.open('https://t.me/ismoilovf_oo5', '_blank');
     } catch (err) {
       setError(err.response?.data?.detail || 'Xatolik yuz berdi');
     } finally {
@@ -63,7 +63,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
               Sizning to'lovingiz admin tomonidan tasdiqlanishi kutilmoqda. Tez orada premium faollashadi.
             </p>
             <button
-              onClick={() => window.open('https://t.me/placeholder_username', '_blank')}
+              onClick={() => window.open('https://t.me/ismoilovf_oo5', '_blank')}
               className="px-6 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors font-medium text-sm"
             >
               Telegram orqali bog'lanish
