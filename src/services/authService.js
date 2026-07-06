@@ -54,5 +54,10 @@ export const authService = {
     const response = await apiClient.post(`${AUTH_BASE}/platform-feedback/`, data);
     return response.data;
   },
+
+  requestPremium: async () => {
+    const response = await apiClient.post(`${AUTH_BASE}/premium-request/`);
+    return response.data;
+  },
 };
 

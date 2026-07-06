@@ -4,23 +4,43 @@ import MainLayout from "../layouts/MainLayout";
 import ErrorMessage from "../components/ErrorMessage";
 import { lessonService } from "../services/lessonService";
 import { formatError } from "../utils/formatError";
+import { useAuth } from "../hooks/useAuth";
+import PremiumModal from "../components/PremiumModal";
 
 export default function LessonCreate() {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const { user, refreshUser } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!prompt.trim()) return;
+    
+    // Check Premium limits
+    if (user && !user.is_premium && user.free_generations <= 0) {
+      setShowPremiumModal(true);
+      return;
+    }
+
     setError("");
     setLoading(true);
     try {
       const lesson = await lessonService.generate({ prompt });
+      if (user && !user.is_premium) {
+        await refreshUser(); // Update free_generations local state
+      }
       navigate(`/lessons/${lesson.id}`);
     } catch (err) {
-      setError(formatError(err));
+      if (err?.response?.data?.code === 'premium_required' || err?.response?.status === 402) {
+        setShowPremiumModal(true);
+        if (user && !user.is_premium) await refreshUser();
+      } else {
+        setError(formatError(err));
+      }
+    } finally {
       setLoading(false);
     }
   };
@@ -43,6 +63,27 @@ export default function LessonCreate() {
             <p className="text-base sm:text-lg text-slate-500 max-w-xl mx-auto leading-relaxed">
               Dars mavzusini erkin yozing. AI avtomatik ravishda dars rejasi, slaydlar va baholashni tayyorlaydi.
             </p>
+
+            {/* Free Plan Progress Bar */}
+            {user && !user.is_premium && (
+              <div className="mt-8 flex flex-col items-center max-w-sm mx-auto bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-lg">🎁</span>
+                  <span className="font-semibold text-slate-700">Bepul ta'rif</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${user.free_generations === 0 ? 'bg-rose-500' : 'bg-indigo-500'}`}
+                    style={{ width: `${((3 - user.free_generations) / 3) * 100}%` }}
+                  ></div>
+                </div>
+                <div className="text-sm font-medium text-slate-500">
+                  <span className={user.free_generations === 0 ? 'text-rose-500 font-bold' : 'text-indigo-600'}>
+                    {3 - user.free_generations}
+                  </span> / 3 dars ishlatildi
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Form Section */}
@@ -108,6 +149,13 @@ export default function LessonCreate() {
           </div>
         </div>
       </div>
+      
+      <PremiumModal 
+        isOpen={showPremiumModal} 
+        onClose={() => setShowPremiumModal(false)} 
+        user={user}
+        onStatusChange={refreshUser}
+      />
     </MainLayout>
   );
 }
