@@ -5,7 +5,9 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import ErrorMessage from "../components/ErrorMessage";
 import StatusBadge from "../components/StatusBadge";
 import LessonContent from "../components/lesson/LessonContent";
-import LessonFeedbackInline from "../components/lessons/LessonFeedbackInline";
+import FeedbackWidget from "../components/FeedbackWidget";
+import PremiumModal from "../components/PremiumModal";
+import { useAuth } from "../hooks/useAuth";
 import { lessonService } from "../services/lessonService";
 import { SUBJECTS, LANGUAGES } from "../utils/constants";
 import { formatError } from "../utils/formatError";
@@ -19,6 +21,8 @@ export default function LessonDetail() {
   const [success, setSuccess] = useState("");
   const [actionLoading, setActionLoading] = useState("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const { user, refreshUser } = useAuth();
 
   const retryCountRef = useRef(0);
   const MAX_RETRIES = 3;
@@ -57,6 +61,11 @@ export default function LessonDetail() {
         }
       } catch (err) {
         if (isMounted) {
+          if (err?.response?.data?.code === 'premium_required' || err?.response?.status === 402) {
+             setShowPremiumModal(true);
+             setLoading(false);
+             return;
+          }
           setError(formatError(err));
           setLoading(false);
         }
@@ -247,11 +256,22 @@ export default function LessonDetail() {
       />
       
       {lesson.status === "completed" && !lesson.has_feedback && (
-        <LessonFeedbackInline 
+        <FeedbackWidget 
+          lessonId={lesson.id}
           onSubmit={handleFeedbackSubmit}
           isSubmitting={submittingFeedback}
         />
       )}
+
+      <PremiumModal 
+        isOpen={showPremiumModal} 
+        onClose={() => {
+          setShowPremiumModal(false);
+          navigate("/lessons"); // Go back to list if they cancel premium modal on detail page
+        }} 
+        user={user}
+        onStatusChange={refreshUser}
+      />
     </MainLayout>
   );
 }

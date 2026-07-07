@@ -11,7 +11,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
 
   const handleSendScreenshot = async () => {
     const openAdminChat = () => {
-      const url = 'https://t.me/ismoilovf_oo5';
+      const url = 'https://t.me/USERNAME'; // Placeholder
       if (window.Telegram?.WebApp?.openTelegramLink) {
         window.Telegram.WebApp.openTelegramLink(url);
       } else {
@@ -29,7 +29,6 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
     
     try {
       await authService.requestPremium();
-      // Update local status so UI reflects pending state
       if (onStatusChange) onStatusChange();
       openAdminChat();
     } catch (err) {
@@ -39,155 +38,159 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
     }
   };
 
+  const handlePrimaryClick = () => {
+    // Redirect to placeholder URL for payment
+    const url = "https://example.com/payment-placeholder";
+    if (window.Telegram?.WebApp?.openLink) {
+      window.Telegram.WebApp.openLink(url);
+    } else {
+      window.open(url, '_blank');
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
-      {/* Light glassmorphism backdrop */}
-      <div 
-        className="absolute inset-0 bg-slate-100/50 backdrop-blur-md transition-opacity"
-        onClick={onClose}
-      />
-      
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-xl transition-opacity dark">
       {/* Modal Container */}
-      <div className="relative w-full max-w-md overflow-hidden rounded-[2.5rem] bg-white shadow-2xl border border-white flex flex-col items-center p-8 transform transition-all">
+      <div className="relative w-full max-w-[900px] overflow-hidden rounded-[2rem] sm:rounded-[3rem] bg-[#0A0A0A] shadow-2xl flex flex-col md:flex-row transform transition-all animate-scale-in text-white border border-white/10">
         
-        {/* Subtle glow effect at the top */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 bg-gradient-to-b from-indigo-500/10 to-transparent pointer-events-none"></div>
-
-        {/* Close Button */}
-        <button 
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors z-10"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {isPending ? (
-          <div className="text-center w-full py-8 relative z-10">
-            <div className="w-24 h-24 mx-auto mb-8 bg-amber-50 rounded-[2rem] flex items-center justify-center text-amber-500 border border-amber-100 shadow-sm relative">
-              <div className="absolute inset-0 rounded-[2rem] bg-amber-400/20 animate-ping"></div>
-              <svg className="w-10 h-10 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-extrabold text-slate-900 mb-4 tracking-tight">
-              To'lov tekshirilmoqda
+        {/* Left Side - Benefits */}
+        <div className="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center relative overflow-hidden bg-gradient-to-br from-[#111111] to-[#0A0A0A]">
+          {/* Subtle glow effect */}
+          <div className="absolute top-0 left-0 w-full h-full bg-indigo-500/10 blur-[100px] pointer-events-none rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+          
+          <div className="relative z-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-3">
+              🚀 Unlock Acadium Pro
             </h2>
-            <p className="text-slate-500 mb-6 font-medium px-4 leading-relaxed text-sm">
-              Sizning to'lovingiz admin tomonidan tasdiqlanishi kutilmoqda. Agar hali to'lovni amalga oshirmagan bo'lsangiz, quyidagi tugma orqali to'lov qiling.
+            <p className="text-slate-400 text-[15px] leading-relaxed mb-8">
+              Your first lesson has been generated successfully. Upgrade to Pro to unlock it and continue generating unlimited lessons.
             </p>
 
-            <div className="space-y-3 px-2">
-              <button
-                onClick={() => {
-                  const url = "https://my.click.uz/auth?request=8B9793CF7A773C3F2295134981584A4589CB99419171778CCA59323E85CB6AEC";
-                  if (window.Telegram?.WebApp?.openLink) {
-                    window.Telegram.WebApp.openLink(url);
-                  } else {
-                    window.open(url, '_blank');
-                  }
-                }}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 active:scale-[0.98] transition-all py-3.5 font-bold text-[15px] shadow-lg"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Click orqali to'lov qilish
-              </button>
-
-              <button
-                onClick={() => {
-                  const url = 'https://t.me/ismoilovf_oo5';
-                  if (window.Telegram?.WebApp?.openTelegramLink) {
-                    window.Telegram.WebApp.openTelegramLink(url);
-                  } else {
-                    window.open(url, '_blank');
-                  }
-                }}
-                className="w-full px-8 py-3.5 bg-slate-100 text-slate-700 rounded-2xl hover:bg-slate-200 transition-colors font-bold text-sm shadow-sm"
-              >
-                Adminga skrinshot yuborish
-              </button>
-            </div>
+            <ul className="space-y-4">
+              {[
+                'Unlimited Lesson Generation',
+                'Unlimited PPT Downloads',
+                'Unlimited AI Assessments',
+                'Unlimited Homework',
+                'Faster AI Generation',
+                'Priority Support'
+              ].map((benefit, idx) => (
+                <li key={idx} className="flex items-center gap-3">
+                  <div className="w-6 h-6 rounded-full bg-indigo-500/20 flex items-center justify-center flex-shrink-0 border border-indigo-500/30">
+                    <svg className="w-3.5 h-3.5 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-slate-300 font-medium text-[15px]">{benefit}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-        ) : (
-          <div className="w-full relative z-10">
-            {/* Header */}
-            <div className="text-center mb-8 mt-2">
-              <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-                Premium Obuna
-              </h2>
-              <p className="text-sm text-slate-500 mt-3 font-medium px-2 leading-relaxed">
-                Cheksiz darslar yaratish va barcha imkoniyatlardan foydalanish uchun obuna bo'ling
-              </p>
-            </div>
+        </div>
 
-            {/* Pricing Card */}
-            <div className="relative rounded-3xl p-7 mb-6 text-white shadow-xl shadow-blue-500/20 overflow-hidden group">
-              {/* Animated background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600"></div>
+        {/* Right Side - Payment / Status */}
+        <div className="w-full md:w-1/2 p-8 sm:p-12 bg-white/5 backdrop-blur-md border-l border-white/5 relative">
+          
+          {/* Close Button */}
+          <button 
+            onClick={onClose}
+            className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition-colors z-20"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {isPending ? (
+            <div className="h-full flex flex-col items-center justify-center text-center animate-fade-in">
+              <div className="w-20 h-20 mb-6 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-400 border border-amber-500/20 shadow-[0_0_30px_rgba(245,158,11,0.2)]">
+                <svg className="w-10 h-10 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold mb-3">⏳ Payment Under Review</h2>
+              <p className="text-slate-400 text-[15px] leading-relaxed mb-8 max-w-sm">
+                Your payment is currently being reviewed by our administrator. Once approved, your Premium subscription will activate automatically.
+              </p>
+              <button
+                onClick={handleSendScreenshot}
+                className="w-full px-6 py-4 bg-white/5 text-white rounded-2xl hover:bg-white/10 transition-colors font-semibold text-[15px] border border-white/10"
+              >
+                Go to Administrator Chat
+              </button>
+            </div>
+          ) : (
+            <div className="h-full flex flex-col justify-center">
               
-              {/* Glassmorphism reflection */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent opacity-50 mix-blend-overlay"></div>
-              
-              {/* Card content */}
-              <div className="relative z-10 text-center">
-                <div className="text-[12px] text-white/90 uppercase tracking-[0.2em] font-bold mb-2">Oylik Obuna Narxi</div>
-                <div className="text-4xl font-extrabold tracking-tight drop-shadow-md mb-6">
-                  50 000 <span className="text-xl font-medium opacity-90">UZS</span>
+              <div className="mb-8">
+                <div className="text-indigo-400 font-bold tracking-wider text-xs uppercase mb-2">Acadium Pro</div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-extrabold tracking-tight">50 000</span>
+                  <span className="text-slate-400 font-medium">UZS / 1 Month</span>
+                </div>
+              </div>
+
+              {/* Fake Credit Card */}
+              <div className="relative w-full aspect-[1.586] rounded-2xl overflow-hidden mb-8 p-6 flex flex-col justify-between border border-white/20 shadow-2xl group">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png')] opacity-20 mix-blend-overlay"></div>
+                
+                <div className="relative z-10 flex justify-between items-center">
+                  <div className="w-10 h-8 rounded bg-white/30 backdrop-blur-md"></div>
+                  <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
                 </div>
                 
+                <div className="relative z-10">
+                  <div className="text-white/60 text-xs mb-1 uppercase tracking-wider">Card Number</div>
+                  <div className="text-2xl font-mono tracking-widest font-semibold text-white/90">8600 **** **** ****</div>
+                </div>
+                
+                <div className="relative z-10 flex justify-between items-end">
+                  <div>
+                    <div className="text-white/60 text-[10px] mb-1 uppercase tracking-wider">Card Holder</div>
+                    <div className="text-sm font-semibold tracking-wide uppercase text-white/90">JOHN DOE</div>
+                  </div>
+                  <div>
+                    <div className="text-white/60 text-[10px] mb-1 uppercase tracking-wider text-right">Expires</div>
+                    <div className="text-sm font-semibold tracking-wide text-white/90">12/28</div>
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="text-sm text-rose-400 bg-rose-500/10 p-3 rounded-xl mb-6 text-center font-medium border border-rose-500/20">
+                  {error}
+                </div>
+              )}
+
+              <div className="space-y-3">
                 <button
-                  onClick={() => {
-                    const url = "https://my.click.uz/auth?request=8B9793CF7A773C3F2295134981584A4589CB99419171778CCA59323E85CB6AEC";
-                    if (window.Telegram?.WebApp?.openLink) {
-                      window.Telegram.WebApp.openLink(url);
-                    } else {
-                      window.open(url, '_blank');
-                    }
-                  }}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white text-blue-600 hover:bg-slate-50 active:scale-[0.98] transition-all py-3.5 font-bold text-[15px] shadow-lg"
+                  onClick={handlePrimaryClick}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white text-black hover:bg-slate-200 active:scale-[0.98] transition-all py-4 font-bold text-[15px] shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Click orqali to'lov qilish
+                  ⚡ Click orqali to'lov qilish
+                </button>
+
+                <button
+                  onClick={handleSendScreenshot}
+                  disabled={loading}
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.98] transition-all text-white py-4 font-semibold text-[15px] border border-white/10 disabled:opacity-50"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      📸 Adminga screenshot yuborish
+                    </>
+                  )}
                 </button>
               </div>
+
             </div>
-
-            <div className="text-center mb-6 px-2">
-              <p className="text-[13px] text-slate-600 font-medium leading-relaxed bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                👆 Dastlab yuqoridagi tugma orqali to'lovni amalga oshiring. So'ngra to'lov muvaffaqiyatli bo'lganligi haqidagi <strong className="text-indigo-600">skrinshotni</strong> yuboring.
-              </p>
-            </div>
-
-            {error && (
-              <div className="text-sm text-rose-600 bg-rose-50 p-4 rounded-2xl mb-6 text-center font-semibold border border-rose-100">
-                {error}
-              </div>
-            )}
-
-            <button
-              onClick={handleSendScreenshot}
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-3 rounded-2xl bg-slate-900 hover:bg-black active:scale-[0.98] transition-all text-white py-4.5 font-bold text-base shadow-lg shadow-slate-900/20 disabled:opacity-70 group"
-              style={{ minHeight: '60px' }}
-            >
-              {loading ? (
-                <div className="w-6 h-6 border-3 border-white/30 border-t-white rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>Skrinshotni yuborish</span>
-                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </>
-              )}
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
