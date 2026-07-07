@@ -11,7 +11,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
 
   const handleSendScreenshot = async () => {
     const openAdminChat = () => {
-      const url = 'https://t.me/USERNAME'; // Placeholder
+      const url = 'https://t.me/ismoilovf_oo5';
       if (window.Telegram?.WebApp?.openTelegramLink) {
         window.Telegram.WebApp.openTelegramLink(url);
       } else {
@@ -40,7 +40,7 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
 
   const handlePrimaryClick = () => {
     // Redirect to placeholder URL for payment
-    const url = "https://example.com/payment-placeholder";
+    const url = "https://my.click.uz/clickp2p/8B9793CF7A773C3F2295134981584A4589CB99419171778CCA59323E85CB6AEC";
     if (window.Telegram?.WebApp?.openLink) {
       window.Telegram.WebApp.openLink(url);
     } else {
@@ -126,37 +126,14 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
                 <div className="text-indigo-400 font-bold tracking-wider text-xs uppercase mb-2">Acadium Pro</div>
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-extrabold tracking-tight">50 000</span>
-                  <span className="text-slate-400 font-medium">UZS / 1 Month</span>
+                  <span className="text-slate-400 font-medium">UZS / 1 Oy</span>
                 </div>
               </div>
 
-              {/* Fake Credit Card */}
-              <div className="relative w-full aspect-[1.586] rounded-2xl overflow-hidden mb-8 p-6 flex flex-col justify-between border border-white/20 shadow-2xl group">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/noise-pattern-with-subtle-cross-lines.png')] opacity-20 mix-blend-overlay"></div>
-                
-                <div className="relative z-10 flex justify-between items-center">
-                  <div className="w-10 h-8 rounded bg-white/30 backdrop-blur-md"></div>
-                  <svg className="w-8 h-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                
-                <div className="relative z-10">
-                  <div className="text-white/60 text-xs mb-1 uppercase tracking-wider">Card Number</div>
-                  <div className="text-2xl font-mono tracking-widest font-semibold text-white/90">8600 **** **** ****</div>
-                </div>
-                
-                <div className="relative z-10 flex justify-between items-end">
-                  <div>
-                    <div className="text-white/60 text-[10px] mb-1 uppercase tracking-wider">Card Holder</div>
-                    <div className="text-sm font-semibold tracking-wide uppercase text-white/90">JOHN DOE</div>
-                  </div>
-                  <div>
-                    <div className="text-white/60 text-[10px] mb-1 uppercase tracking-wider text-right">Expires</div>
-                    <div className="text-sm font-semibold tracking-wide text-white/90">12/28</div>
-                  </div>
-                </div>
+              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-5 mb-8">
+                <p className="text-sm text-slate-300 leading-relaxed">
+                  To'lovni amalga oshirish uchun pastdagi <strong className="text-white">"Click orqali to'lov qilish"</strong> tugmasini bosing. To'lov tugagach, to'lov cheki (skrinshot)ni <strong className="text-white">adminga yuboring</strong>.
+                </p>
               </div>
 
               {error && (
@@ -170,19 +147,25 @@ export default function PremiumModal({ isOpen, onClose, user, onStatusChange }) 
                   onClick={handlePrimaryClick}
                   className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white text-black hover:bg-slate-200 active:scale-[0.98] transition-all py-4 font-bold text-[15px] shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                 >
-                  ⚡ Click orqali to'lov qilish
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Click orqali to'lov qilish
                 </button>
 
                 <button
                   onClick={handleSendScreenshot}
                   disabled={loading}
-                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-[0.98] transition-all text-white py-4 font-semibold text-[15px] border border-white/10 disabled:opacity-50"
+                  className="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#2AABEE] hover:bg-[#2298D6] active:scale-[0.98] transition-all text-white py-4 font-bold text-[15px] shadow-[0_0_20px_rgba(42,171,238,0.2)] disabled:opacity-50"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
-                      📸 Adminga screenshot yuborish
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.11.03-1.84 1.18-5.21 3.45-.49.33-.94.5-1.35.49-.45-.01-1.32-.26-1.96-.46-.79-.26-1.42-.4-1.36-.84.03-.22.34-.44.93-.67 3.65-1.59 6.09-2.64 7.31-3.14 3.48-1.42 4.2-1.67 4.67-1.68.1 0 .33.02.48.14.12.1.17.24.19.34.02.14.03.3.01.44z"/>
+                      </svg>
+                      Adminga skrinshot yuborish
                     </>
                   )}
                 </button>
