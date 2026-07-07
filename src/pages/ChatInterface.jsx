@@ -139,7 +139,12 @@ export default function ChatInterface() {
         }
       } catch (err) {
         if (isMounted) {
-          setLessonError(formatError(err));
+          if (err?.response?.status === 402 || err?.response?.data?.code === 'premium_required') {
+            setShowPremiumModal(true);
+            if (user && !user.is_premium) refreshUser();
+          } else {
+            setLessonError(formatError(err));
+          }
           setLessonLoading(false);
           setIsGenerating(false);
           setIsRegenerating(false);
