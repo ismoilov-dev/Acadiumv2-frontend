@@ -42,9 +42,9 @@ export default function FeedbackWidget({ lessonId, onSubmit, isSubmitting }) {
 
   return (
     <>
-      {/* Toast Notification at Bottom Right */}
+      {/* Toast Notification at Top Center */}
       {showToast && !isOpen && !submitted && (
-        <div className="fixed bottom-6 right-6 z-50 animate-fade-in-up">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl border border-slate-100 p-5 w-72 transform transition-all duration-300">
             <div className="flex justify-between items-start mb-3">
               <h3 className="text-[15px] font-bold text-slate-900">
