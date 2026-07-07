@@ -8,7 +8,7 @@ import LessonContent from "../components/lesson/LessonContent";
 import StatusBadge from "../components/StatusBadge";
 import ProfileDrawer from "../components/ProfileDrawer";
 import ComingSoonModal from "../components/ComingSoonModal";
-import GlobalPlatformFeedback from "../components/GlobalPlatformFeedback";
+import FeedbackWidget from "../components/FeedbackWidget";
 import PremiumModal from "../components/PremiumModal";
 
 export default function ChatInterface() {
@@ -805,7 +805,15 @@ export default function ChatInterface() {
       />
 
       {/* Platform Feedback */}
-      <GlobalPlatformFeedback />
+      {lesson && lesson.status === "completed" && (
+        <FeedbackWidget 
+          lessonId={lesson.id} 
+          onSubmit={async (feedback) => {
+            console.log("Feedback submitted:", feedback);
+            // In a real app, send to backend.
+          }} 
+        />
+      )}
 
       {/* Context Menu */}
       {contextMenu.visible && (
