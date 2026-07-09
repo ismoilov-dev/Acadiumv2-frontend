@@ -5,7 +5,7 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import PublicLesson from '../pages/PublicLesson';
 import { storage } from '../utils/storage';
-import { isTelegram } from '../App';
+import { isTelegram } from '../services/telegramAuth';
 
 function GuestRoute({ children }) {
   if (storage.getAccessToken() || isTelegram()) {
