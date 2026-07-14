@@ -21,7 +21,8 @@ export default function App() {
             await authService.telegramLogin(initData);
           } catch (err) {
             console.error('Telegram auth failed:', err);
-            setError('Telegram authentication failed');
+            const errorMsg = err.response?.data?.detail || err.message || 'Telegram authentication failed';
+            setError(`Authentication failed: ${errorMsg}`);
           }
         }
       } catch (err) {
