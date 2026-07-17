@@ -7,9 +7,9 @@ const getBaseURL = () => {
   const raw = import.meta.env.VITE_API_BASE_URL?.trim();
   if (raw) {
     const normalized = normalizeBaseURL(raw);
-    return normalized.endsWith('/api') ? normalized : `${normalized}/api`;
+    return normalized.endsWith('/api') ? `${normalized}/` : `${normalized}/api/`;
   }
-  return `${window.location.origin}/api`;
+  return `${window.location.origin}/api/`;
 };
 
 const apiClient = axios.create({
@@ -63,7 +63,7 @@ apiClient.interceptors.response.use(
         originalRequest._retry = true;
         isRefreshing = true;
         try {
-          const { data } = await axios.post(`${getBaseURL()}/auth/telegram/`, { init_data: tgInitData });
+          const { data } = await axios.post(`${getBaseURL()}auth/telegram/`, { init_data: tgInitData });
           storage.setAccessToken(data.access);
           storage.setRefreshToken(data.refresh);
           storage.setUser(data.user);
@@ -97,7 +97,7 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      const { data } = await axios.post(`${getBaseURL()}/auth/token/refresh/`, {
+      const { data } = await axios.post(`${getBaseURL()}auth/token/refresh/`, {
         refresh: refreshToken,
       });
       storage.setAccessToken(data.access);
@@ -107,7 +107,7 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       if (tgInitData) {
         try {
-          const { data } = await axios.post(`${getBaseURL()}/auth/telegram/`, { init_data: tgInitData });
+          const { data } = await axios.post(`${getBaseURL()}auth/telegram/`, { init_data: tgInitData });
           storage.setAccessToken(data.access);
           storage.setRefreshToken(data.refresh);
           storage.setUser(data.user);
