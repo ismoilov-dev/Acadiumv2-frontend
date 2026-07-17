@@ -4,12 +4,7 @@ import { storage } from '../utils/storage';
 const normalizeBaseURL = (url) => url.replace(/\/+$/, '');
 
 const getBaseURL = () => {
-  const raw = import.meta.env.VITE_API_BASE_URL?.trim();
-  if (raw) {
-    const normalized = normalizeBaseURL(raw);
-    return normalized.endsWith('/api') ? `${normalized}/` : `${normalized}/api/`;
-  }
-  return `${window.location.origin}/api/`;
+  return 'https://acadium.duckdns.org/api/';
 };
 
 const apiClient = axios.create({
