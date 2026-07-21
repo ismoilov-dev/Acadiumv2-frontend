@@ -22,6 +22,7 @@ export default function LessonDetail() {
   const [actionLoading, setActionLoading] = useState("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const { user, refreshUser } = useAuth();
 
   const retryCountRef = useRef(0);
@@ -208,19 +209,15 @@ export default function LessonDetail() {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
-          {lesson.status === "completed" && (
-            <>
-              <button
-                type="button"
-                onClick={handleDownload}
-                disabled={!!actionLoading}
-                className="rounded-lg bg-primary-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50 tap-target flex items-center justify-center"
-              >
-                {actionLoading === "download"
-                  ? "Yuklanmoqda..."
-                  : "PPTX yuklab olish"}
-              </button>
-            </>
+          {lesson.status === "completed" && !lesson.has_feedback && (
+            <button
+              type="button"
+              onClick={() => setShowFeedbackModal(true)}
+              disabled={!!actionLoading}
+              className="rounded-lg bg-primary-600 px-4 py-2.5 text-xs sm:text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50 tap-target flex items-center justify-center"
+            >
+              Fikr bildirish
+            </button>
           )}
           <button
             type="button"
@@ -253,6 +250,8 @@ export default function LessonDetail() {
             alert(err);
           }
         }}
+        onDownload={handleDownload}
+        isDownloading={actionLoading === "download"}
       />
       
       {lesson.status === "completed" && !lesson.has_feedback && (
@@ -260,6 +259,8 @@ export default function LessonDetail() {
           lessonId={lesson.id}
           onSubmit={handleFeedbackSubmit}
           isSubmitting={submittingFeedback}
+          externalOpen={showFeedbackModal}
+          onCloseExternal={() => setShowFeedbackModal(false)}
         />
       )}
 

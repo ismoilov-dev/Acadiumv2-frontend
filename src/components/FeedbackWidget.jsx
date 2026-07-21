@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function FeedbackWidget({ lessonId, onSubmit, isSubmitting }) {
+export default function FeedbackWidget({ lessonId, onSubmit, isSubmitting, externalOpen, onCloseExternal }) {
   const [isOpen, setIsOpen] = useState(false); // Modal state
   const [showToast, setShowToast] = useState(false); // Toast state
   const [rating, setRating] = useState(0);
@@ -22,6 +22,13 @@ export default function FeedbackWidget({ lessonId, onSubmit, isSubmitting }) {
     setShowToast(false); // Hide toast when modal opens
   };
 
+  useEffect(() => {
+    if (externalOpen) {
+      setIsOpen(true);
+      setShowToast(false);
+    }
+  }, [externalOpen]);
+
   const handleSubmit = async () => {
     if (rating === 0) return;
     await onSubmit({ rating, comment });
@@ -33,6 +40,7 @@ export default function FeedbackWidget({ lessonId, onSubmit, isSubmitting }) {
 
   const handleCancel = () => {
     setIsOpen(false);
+    if (onCloseExternal) onCloseExternal();
     setRating(0);
     setComment('');
     // Optionally show toast again, or just hide entirely.

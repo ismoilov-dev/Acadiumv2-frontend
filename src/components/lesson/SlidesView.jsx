@@ -42,7 +42,7 @@ function SlideCard({ slide }) {
   );
 }
 
-export default function SlidesView({ slidesData }) {
+export default function SlidesView({ slidesData, onDownload, isDownloading }) {
   const slides = Array.isArray(slidesData?.slides)
     ? slidesData.slides
     : Array.isArray(slidesData)
@@ -60,9 +60,21 @@ export default function SlidesView({ slidesData }) {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">Slaydlar</h2>
-        <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
-          {slides.length} ta slayd
-        </span>
+        <div className="flex items-center gap-3">
+          {onDownload && (
+            <button
+              type="button"
+              onClick={onDownload}
+              disabled={isDownloading}
+              className="rounded-lg bg-primary-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center shadow-sm tap-target transition-colors"
+            >
+              {isDownloading ? "Yuklanmoqda..." : "PPTX yuklab olish"}
+            </button>
+          )}
+          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 hidden sm:inline-block">
+            {slides.length} ta slayd
+          </span>
+        </div>
       </div>
 
       <SlideCard slide={slides[current]} />

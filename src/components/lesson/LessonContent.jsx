@@ -11,6 +11,8 @@ export default function LessonContent({
   failedStage,
   errorMessage,
   onRetry,
+  onDownload,
+  isDownloading,
 }) {
   const hasContent = lessonPlan && slides && assessment;
   const isGenerating =
@@ -69,7 +71,7 @@ export default function LessonContent({
   return (
     <div className="space-y-8">
       {lessonPlan && <LessonPlanView plan={lessonPlan} />}
-      {slides && <SlidesView slidesData={slides} />}
+      {slides && <SlidesView slidesData={slides} onDownload={onDownload} isDownloading={isDownloading} />}
       {assessment && <AssessmentView assessment={assessment} />}
     </div>
   );
