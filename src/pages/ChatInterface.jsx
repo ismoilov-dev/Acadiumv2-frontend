@@ -35,6 +35,8 @@ export default function ChatInterface() {
   const [generateError, setGenerateError] = useState("");
   const [progress, setProgress] = useState(0);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
   // Context Menu and Modals state
   const [contextMenu, setContextMenu] = useState({
@@ -258,11 +260,14 @@ export default function ChatInterface() {
 
   const handleDownload = async () => {
     if (!lesson) return;
+    setIsDownloading(true);
     try {
       await lessonService.sendToTelegram(lesson.id);
       alert("✅ PPTX fayl Telegram chatga yuborildi.");
     } catch (err) {
       alert(formatError(err));
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -625,6 +630,8 @@ export default function ChatInterface() {
                             status={lesson.status}
                             failedStage={lesson.failed_stage}
                             errorMessage={lesson.error_message}
+                            onDownload={handleDownload}
+                            isDownloading={isDownloading}
                             onRetry={async () => {
                               if (!lesson) return;
                               try {
@@ -724,25 +731,22 @@ export default function ChatInterface() {
                     </svg>
                     Share Lesson
                   </button>
-                  <button
-                    onClick={handleDownload}
-                    className="flex-1 bg-slate-100 text-slate-800 rounded-xl py-3.5 font-medium flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base"
-                  >
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
+                  {!lesson.has_feedback && (
+                    <button
+                      onClick={() => setShowFeedbackModal(true)}
+                      className="flex-1 bg-slate-100 text-slate-800 rounded-xl py-3.5 font-medium flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors shadow-sm text-sm sm:text-base"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                    PPTX Download
-                  </button>
+                      <svg
+                        className="w-5 h-5 text-indigo-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                      </svg>
+                      Fikr bildirish
+                    </button>
+                  )}
                 </div>
               </div>
             ) : !id ? (
@@ -810,12 +814,18 @@ export default function ChatInterface() {
       />
 
       {/* Platform Feedback */}
-      {lesson && lesson.status === "completed" && (
+      {lesson && lesson.status === "completed" && !lesson.has_feedback && (
         <FeedbackWidget 
           lessonId={lesson.id} 
+          externalOpen={showFeedbackModal}
+          onCloseExternal={() => setShowFeedbackModal(false)}
           onSubmit={async (feedback) => {
-            console.log("Feedback submitted:", feedback);
-            // In a real app, send to backend.
+            try {
+              await lessonService.submitFeedback(lesson.id, feedback);
+              setLesson(prev => ({ ...prev, has_feedback: true }));
+            } catch (err) {
+              alert(formatError(err));
+            }
           }} 
         />
       )}
